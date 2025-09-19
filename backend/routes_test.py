@@ -10,7 +10,7 @@ def test_long_password():
         long_password = "a" * 200
         student = Student(
             name="LongPassUser",
-            email="longpass@example.com",
+            email=" nouran223@example.com",
             password=long_password
         )
         db.session.add(student)

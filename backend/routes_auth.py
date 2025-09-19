@@ -12,15 +12,20 @@ auth_bp = Blueprint("auth", __name__)
 
 def register_student():
     data = request.json 
+
+  #check if email already exists
+    if Student.query.filter_by(email=data["email"]).first():
+        return jsonify({"msg": "email already exists"}), 400
+    
+    
+    #create new student
     user = Student(
         name=data["name"],
         email=data["email"],
         password=generate_password_hash(data["password"])#
     )
 
-    #check if email already exists
-    if Student.query.filter_by(email=data["email"]).first():
-        return jsonify({"msg": "email already exists"}), 400
+  
     #add to database
     db.session.add(user)
     db.session.commit()
