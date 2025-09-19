@@ -49,3 +49,16 @@ def login():
         )
     #if login is successful return token and role
     return jsonify({"token": token, "role": role})
+
+
+#route for testing protected route
+@auth_bp.route("/test-db")
+def test_db():
+    try:
+        # تجربة إدخال بيانات
+        student = Student(name="TestUser", email="testuser@example.com", password="12345")
+        db.session.add(student)
+        db.session.commit()
+        return "Database connected and data inserted successfully!"
+    except Exception as e:
+        return f"Error: {e}"
