@@ -25,7 +25,7 @@ export default function LoginPage() {
       if (token) {
         localStorage.setItem('authToken', token);
         alert('Login Successful!');
-        router.push('/complaints/new');
+        router.push('/student/complaints/new');
       } else {
         setError('Login successful, but no token was provided.');
       }
@@ -65,7 +65,7 @@ export default function LoginPage() {
           <button type="submit" className="flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white">Login</button>
           <p className="text-center text-sm">
             Don't have an account?
-            <Link href="/register" className="font-medium text-indigo-600 ml-1">Register Now</Link>
+            <Link href="/student/register" className="font-medium text-indigo-600 ml-1">Register Now</Link>
           </p>
         </form>
       </div>

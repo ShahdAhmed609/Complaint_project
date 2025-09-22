@@ -27,7 +27,7 @@ export default function RegisterPage() {
         password: password,
       });
       alert('Registration successful! Please login.');
-      router.push('/login');
+      router.push('/student/login');
     } catch (err: any) {
       console.error("Registration Error:", err);
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
@@ -59,7 +59,7 @@ export default function RegisterPage() {
           <button type="submit" className="flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white">Register</button>
           <p className="text-center text-sm">
             Already have an account?
-            <Link href="/login" className="font-medium text-indigo-600 ml-1">Login Now</Link>
+            <Link href="/student/login" className="font-medium text-indigo-600 ml-1">Login Now</Link>
           </p>
         </form>
       </div>

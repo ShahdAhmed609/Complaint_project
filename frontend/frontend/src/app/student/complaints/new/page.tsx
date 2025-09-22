@@ -14,7 +14,7 @@ export default function NewComplaintPage() {
     e.preventDefault();
     const complaintData = { title, department, description, fileName: file ? file.name : 'No file attached' };
     sessionStorage.setItem('complaintData', JSON.stringify(complaintData));
-    router.push('/complaints/review');
+    router.push('/student/complaints/review');
   };
 
   return (
