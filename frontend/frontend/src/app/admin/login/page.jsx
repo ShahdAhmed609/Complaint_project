@@ -14,7 +14,7 @@ export default function AdminLogin() {
 
     try {
       // ✅ Send login request to Flask backend
-      const res = await axios.post("http://127.0.0.1:5000/api/auth/admin/login", {
+      const res = await axios.post("http://127.0.0.1:5000/api/auth/login", {
         email: username,
         password: password,
       });
