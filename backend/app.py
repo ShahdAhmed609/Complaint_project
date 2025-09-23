@@ -15,14 +15,20 @@ def create_app():
     app = Flask(__name__)
 
     # Config
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:2025@localhost:5432/complaint_db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:2023@localhost:5432/complaint_db'
     app.config["SECRET_KEY"] = "dev_secret"
     app.config["JWT_SECRET_KEY"] = "jwt_secret"
     app.config["UPLOAD_FOLDER"] = "uploads"
 
     db.init_app(app)
     jwt.init_app(app)
-    CORS(app)
+    CORS(
+    app,
+    resources={r"/api/*": {"origins": "http://localhost:3000"}},
+    supports_credentials=True,
+    allow_headers=["Content-Type", "Authorization"]
+     )
+
 
     # create tables once and test connection
     with app.app_context():
