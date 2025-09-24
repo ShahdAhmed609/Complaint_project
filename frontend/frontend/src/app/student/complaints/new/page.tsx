@@ -8,7 +8,6 @@ export default function NewComplaintPage() {
   const [department, setDepartment] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
   const router = useRouter();
 
   // ✅ تحميل البيانات المحفوظة لو رجع من review
@@ -19,41 +18,32 @@ export default function NewComplaintPage() {
       setTitle(parsed.title || "");
       setDepartment(parsed.department || "");
       setDescription(parsed.description || "");
-      if (parsed.fileName) {
-        setUploadedFileUrl(parsed.fileUrl || null);
-      }
     }
   }, []);
 
-  // ✅ رفع الملف مباشرة للسيرفر عند اختياره
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // ✅ تخزين الملف في state و sessionStorage
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
     if (!selectedFile) return;
+
     setFile(selectedFile);
 
-    const token = localStorage.getItem("authToken");
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
-    try {
-      const res = await fetch("http://127.0.0.1:5000/api/complaints/upload-temp", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Upload failed");
-      const result = await res.json();
-      setUploadedFileUrl(result.fileUrl); // السيرفر بيرجع رابط الملف
-    } catch (err) {
-      console.error("❌ File upload error:", err);
-      alert("Failed to upload file");
-    }
+    // نخزن بيانات الملف مؤقتًا كـ Base64 في sessionStorage
+    const reader = new FileReader();
+    reader.onload = () => {
+      sessionStorage.setItem(
+        "uploadedFile",
+        JSON.stringify({
+          name: selectedFile.name,
+          type: selectedFile.type,
+          data: reader.result, // base64 data
+        })
+      );
+    };
+    reader.readAsDataURL(selectedFile);
   };
 
-  // ✅ حفظ البيانات في sessionStorage والانتقال للـ review
+  // ✅ حفظ البيانات النصية في sessionStorage والانتقال للـ review
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -61,8 +51,7 @@ export default function NewComplaintPage() {
       title,
       department,
       description,
-      fileName: file ? file.name : null,
-      fileUrl: uploadedFileUrl, // رابط الملف المرفوع
+      fileName: file ? file.name : null, // مجرد الاسم للعرض
     };
 
     sessionStorage.setItem("complaintData", JSON.stringify(complaintData));
@@ -112,9 +101,9 @@ export default function NewComplaintPage() {
             className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0"
           />
 
-          {uploadedFileUrl && (
+          {file && (
             <p className="text-green-600 text-sm">
-              ✅ File uploaded: <a href={uploadedFileUrl}>View</a>
+              ✅ Selected file: {file.name}
             </p>
           )}
 

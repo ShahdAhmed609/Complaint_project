@@ -1,6 +1,6 @@
 "use client";
-
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import axios from "axios";
 
 export default function AdminComplaintsPage() {
@@ -35,58 +35,12 @@ export default function AdminComplaintsPage() {
     fetchData();
   }, []);
 
-  const handleReply = async (id) => {
-    const reply = prompt("Enter your reply:");
-    if (!reply) return;
-    try {
-      const token = localStorage.getItem("adminToken");
-      await axios.post(
-        `http://127.0.0.1:5000/api/complaints/${id}/reply`,
-        { reply, status: "resolved" },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchData();
-    } catch (err) {
-      alert("Error sending reply.");
-    }
-  };
-
-  const handleTerminate = async (id) => {
-    if (!confirm("Are you sure you want to terminate this complaint?")) return;
-    try {
-      const token = localStorage.getItem("adminToken");
-      await axios.post(
-        `http://127.0.0.1:5000/api/complaints/${id}/reply`,
-        { status: "terminated" },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchData();
-    } catch (err) {
-      alert("Error terminating complaint.");
-    }
-  };
-
-  if (loading)
-    return <p className="text-center mt-10 text-gray-700">Loading complaints…</p>;
-
-  if (error)
-    return (
-      <div className="text-center mt-10 text-red-600">
-        {error}
-        <button
-          onClick={fetchData}
-          className="ml-4 px-3 py-1 bg-blue-600 text-white rounded"
-        >
-          Retry
-        </button>
-      </div>
-    );
+  if (loading) return <p className="text-center mt-10">Loading complaints…</p>;
+  if (error) return <p className="text-center mt-10 text-red-600">{error}</p>;
 
   return (
     <div className="max-w-6xl mx-auto mt-10 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Admin Complaints Dashboard
-      </h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">All Complaints</h1>
 
       {complaints.length === 0 ? (
         <p className="text-center text-gray-500">No complaints available.</p>
@@ -96,42 +50,26 @@ export default function AdminComplaintsPage() {
             <thead className="bg-gray-100">
               <tr>
                 <th className="py-3 px-4 border-b">Title</th>
-                <th className="py-3 px-4 border-b">Student ID</th>
+                <th className="py-3 px-4 border-b">Student</th>
                 <th className="py-3 px-4 border-b">Department</th>
                 <th className="py-3 px-4 border-b">Status</th>
-                <th className="py-3 px-4 border-b">Actions</th>
+                <th className="py-3 px-4 border-b">Action</th>
               </tr>
             </thead>
             <tbody>
               {complaints.map((c) => (
                 <tr key={c.id} className="hover:bg-gray-50">
-                  <td className="py-3 px-4 border-b text-gray-800">{c.title}</td>
-                  <td className="py-3 px-4 border-b text-gray-600">{c.student_id}</td>
-                  <td className="py-3 px-4 border-b text-gray-600">{c.department}</td>
-                  <td
-                    className={`py-3 px-4 border-b font-semibold ${
-                      c.status === "resolved"
-                        ? "text-green-600"
-                        : c.status === "terminated"
-                        ? "text-red-600"
-                        : "text-yellow-600"
-                    }`}
-                  >
-                    {c.status}
-                  </td>
-                  <td className="py-3 px-4 border-b space-x-2">
-                    <button
-                      onClick={() => handleReply(c.id)}
-                      className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                  <td className="py-3 px-4 border-b">{c.title}</td>
+                  <td className="py-3 px-4 border-b">{c.student_id}</td>
+                  <td className="py-3 px-4 border-b">{c.department}</td>
+                  <td className="py-3 px-4 border-b">{c.status}</td>
+                  <td className="py-3 px-4 border-b">
+                    <Link
+                      href={`/admin/complaints/${c.id}`}
+                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
                     >
-                      Reply
-                    </button>
-                    <button
-                      onClick={() => handleTerminate(c.id)}
-                      className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                    >
-                      Terminate
-                    </button>
+                      View / Manage
+                    </Link>
                   </td>
                 </tr>
               ))}

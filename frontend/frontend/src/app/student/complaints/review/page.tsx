@@ -6,18 +6,39 @@ interface ComplaintData {
   title: string;
   department: string;
   description: string;
+  suggestion?: string;
   fileName?: string;
-  file?: File;
 }
 
 export default function ReviewComplaintPage() {
   const [data, setData] = useState<ComplaintData | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const router = useRouter();
 
   useEffect(() => {
+    // ✅ تحميل البيانات النصية
     const storedData = sessionStorage.getItem("complaintData");
-    if (storedData) setData(JSON.parse(storedData));
-    else router.push("/student/complaints/new"); // ✅ صححت المسار
+    if (storedData) {
+      const parsed = JSON.parse(storedData);
+      setData(parsed);
+    } else {
+      router.push("/student/complaints/new");
+    }
+
+    // ✅ تحميل الملف من sessionStorage (base64 → File)
+    const storedFile = sessionStorage.getItem("uploadedFile");
+    if (storedFile) {
+      const parsed = JSON.parse(storedFile);
+      const byteString = atob(parsed.data.split(",")[1]); // نفصل الـ header عن الداتا
+      const mimeString = parsed.type;
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      const newFile = new File([ab], parsed.name, { type: mimeString });
+      setFile(newFile);
+    }
   }, [router]);
 
   const handleSubmit = async () => {
@@ -28,8 +49,10 @@ export default function ReviewComplaintPage() {
       formData.append("title", data.title);
       formData.append("department", data.department);
       formData.append("description", data.description);
-      if (data.file) {
-        formData.append("file", data.file);
+      if (data.suggestion) formData.append("suggestion", data.suggestion);
+
+      if (file) {
+        formData.append("file", file); // ✅ الملف الحقيقي يتبعت هنا
       }
 
       const token = localStorage.getItem("authToken");
@@ -51,7 +74,6 @@ export default function ReviewComplaintPage() {
       const result = await res.json();
       console.log("✅ Server Response JSON:", result);
 
-      // ✅ بدل الـ alert نوديه على صفحة النجاح
       router.push("/student/complaints/success");
     } catch (err) {
       console.error("🔥 Submit Error:", err);
@@ -82,7 +104,7 @@ export default function ReviewComplaintPage() {
           </div>
           <div>
             <h2>File:</h2>
-            <p>{data.fileName}</p>
+            <p>{file ? file.name : "No file attached"}</p>
           </div>
         </div>
         <div className="mt-8 flex justify-between gap-4">

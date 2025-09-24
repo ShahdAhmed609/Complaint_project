@@ -11,6 +11,8 @@ ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "pdf", "docx", "txt"}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# ----------------- Create Complaint -----------------
 @complaints_bp.route("/create", methods=["POST"])
 @jwt_required()
 def create_complaint():
@@ -20,12 +22,6 @@ def create_complaint():
     if claims.get("role") != "student":
         return jsonify({"msg": "Only students can create complaints"}), 403
 
-    # Debug logs
-    print(" Received complaint form:", dict(request.form))
-    print(" Files:", request.files)
-    print(" Student ID:", identity)
-
-    # Read form data
     title = request.form.get("title")
     department = request.form.get("department")
     description = request.form.get("description")
@@ -49,18 +45,15 @@ def create_complaint():
         upload_folder = current_app.config.get("UPLOAD_FOLDER", "uploads")
         os.makedirs(upload_folder, exist_ok=True)
         file.save(os.path.join(upload_folder, filename))
-        comp.file_path = os.path.join(upload_folder, filename)
+        # نخزن اسم الملف فقط
+        comp.file_path = filename
 
-    # Save to DB
     db.session.add(comp)
     db.session.commit()
 
-    print("✅ Complaint saved with ID:", comp.id)
-
     return jsonify({"msg": "Complaint created", "id": comp.id}), 201
 
-
-# Student: my complaints
+# ----------------- Student Complaints -----------------
 @complaints_bp.route("/my", methods=["GET"])
 @jwt_required()
 def my_complaints():
@@ -84,8 +77,7 @@ def my_complaints():
         } for c in comps
     ])
 
-
-# Admin: all complaints
+# ----------------- Admin: All Complaints -----------------
 @complaints_bp.route("/all", methods=["GET"])
 @jwt_required()
 def all_complaints():
@@ -108,8 +100,7 @@ def all_complaints():
         } for c in comps
     ])
 
-
-# Admin: reply to complaint
+# ----------------- Admin: Reply -----------------
 @complaints_bp.route("/<int:id>/reply", methods=["POST"])
 @jwt_required()
 def reply(id):
@@ -122,7 +113,6 @@ def reply(id):
     reply_text = data.get("reply")
     status = data.get("status", comp.status)
 
-    # validate status
     if status not in ["pending", "resolved", "terminated"]:
         return jsonify({"msg": "Invalid status"}), 400
 
@@ -131,8 +121,7 @@ def reply(id):
     db.session.commit()
     return jsonify({"msg": "Reply saved"})
 
-
-# route to upload a file temporarily and get its URL
+# ----------------- Upload Temp -----------------
 @complaints_bp.route("/upload-temp", methods=["POST"])
 @jwt_required()
 def upload_temp():
@@ -150,8 +139,8 @@ def upload_temp():
 
     return jsonify({"msg": "Invalid file"}), 400
 
-
-# Serve uploaded files
+# ----------------- Serve Files -----------------
 @complaints_bp.route("/files/<filename>", methods=["GET"])
 def get_file(filename):
-    return send_from_directory(current_app.config.get("UPLOAD_FOLDER", "uploads"), filename)
+    upload_folder = current_app.config.get("UPLOAD_FOLDER", "uploads")
+    return send_from_directory(upload_folder, filename)
