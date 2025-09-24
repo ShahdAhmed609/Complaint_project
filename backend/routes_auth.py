@@ -29,7 +29,7 @@ def register_student():
     return jsonify({"msg": "Student registered"}), 201
 
 
-# route for login student or admin
+# route for login student 
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.json
@@ -54,6 +54,25 @@ def login():
     # return token + role
     return jsonify({"token": token, "role": role}), 200
 
+# route for admin login only
+@auth_bp.route("/admin/login", methods=["POST"])
+def admin_login():
+    data = request.json
+    email, password = data["email"], data["password"]
+
+    # check admin
+    admin_user = Admin.query.filter_by(email=email).first()
+    if not admin_user or not check_password_hash(admin_user.password, password):
+        return jsonify({"msg": "Invalid admin credentials"}), 401
+
+    # token fo the admin
+    token = create_access_token(
+        identity=str(admin_user.id),
+        additional_claims={"role": "admin"},
+        expires_delta=datetime.timedelta(days=1)
+    )
+
+    return jsonify({"token": token, "role": "admin"}), 200
 
 # route for testing protected route
 @auth_bp.route("/test-db")

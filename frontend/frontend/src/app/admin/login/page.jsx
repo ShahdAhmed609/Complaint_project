@@ -10,34 +10,26 @@ export default function AdminLogin() {
   const router = useRouter();
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // prevent reload
+    e.preventDefault(); 
 
     try {
-      // ✅ Send login request to Flask backend
-      const res = await axios.post("http://127.0.0.1:5000/api/auth/login", {
+     
+      const res = await axios.post("http://127.0.0.1:5000/api/auth/admin/login", {
         email: username,
         password: password,
       });
 
-      // ✅ If login is successful, save token
+    
       if (res.data && res.data.token) {
         localStorage.setItem("adminToken", res.data.token);
-
-        // redirect to admin dashboard
-        router.push("/admin");
+        router.push("/admin"); 
       } else {
         setError("Invalid login response from server");
       }
     } catch (err) {
-      console.error(err);
-      setError("Login failed. Please check your credentials.");
+      console.error("Login error:", err);
+      setError("Login failed. Please check your admin credentials.");
     }
-
-    // if (username === "admin" && password === "1234") {
-    //   router.push("/admin");
-    // } else {
-    //   alert("Invalid username or password");
-    // }
   };
 
   return (
@@ -54,10 +46,11 @@ export default function AdminLogin() {
 
         <input
           type="text"
-          placeholder="Username or Email"
+          placeholder="Admin Email"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="w-full mb-4 p-2 border rounded text-black"
+          required
         />
 
         <input
@@ -66,6 +59,7 @@ export default function AdminLogin() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full mb-4 p-2 border rounded text-black"
+          required
         />
 
         <button
