@@ -13,15 +13,19 @@ export default function AdminLogin() {
     e.preventDefault(); 
 
     try {
-     
       const res = await axios.post("http://127.0.0.1:5000/api/auth/admin/login", {
         email: username,
         password: password,
       });
 
-    
       if (res.data && res.data.token) {
+        // 🧹 امسح أي بيانات قديمة (طالب مثلاً)
+        localStorage.clear();
+
+        // 🎯 خزّن بيانات الأدمن
         localStorage.setItem("adminToken", res.data.token);
+        localStorage.setItem("role", "admin");
+
         router.push("/admin"); 
       } else {
         setError("Invalid login response from server");

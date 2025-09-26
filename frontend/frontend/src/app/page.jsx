@@ -1,4 +1,4 @@
-// // src/app/page.js
+// src/app/page.jsx
 import Link from "next/link";
 
 export default function Home() {

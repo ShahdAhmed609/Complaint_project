@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 interface Complaint {
   id: number;
@@ -20,15 +21,14 @@ export default function MyComplaintsPage() {
     const fetchComplaints = async () => {
       try {
         const token = localStorage.getItem("authToken");
-        const res = await fetch("http://127.0.0.1:5000/api/complaints/my", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) throw new Error("Failed to fetch complaints");
-
-        const data = await res.json();
+        const { data } = await axios.get<Complaint[]>(
+          "http://127.0.0.1:5000/api/complaints/my",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setComplaints(data);
       } catch (err) {
         console.error("Error fetching complaints:", err);
@@ -48,9 +48,7 @@ export default function MyComplaintsPage() {
   return (
     <main className="flex min-h-screen flex-col items-center bg-slate-50 p-8">
       <div className="w-full max-w-3xl rounded-xl bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-3xl font-bold text-slate-800">
-          My Complaints
-        </h1>
+        <h1 className="mb-6 text-3xl font-bold text-slate-800">My Complaints</h1>
         <div className="space-y-6">
           {complaints.map((c) => (
             <div
@@ -69,6 +67,7 @@ export default function MyComplaintsPage() {
                 <a
                   href={`http://127.0.0.1:5000/api/complaints/files/${c.file_path.split("/").pop()}`}
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="mt-2 block text-blue-600 underline"
                 >
                   View Attachment
