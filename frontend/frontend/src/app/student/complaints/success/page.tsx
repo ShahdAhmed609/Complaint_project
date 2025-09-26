@@ -16,13 +16,13 @@ export default function SuccessPage() {
         <div className="flex gap-4">
           <button
             onClick={() => router.push("/student/complaints/my")}
-            className="flex-1 rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white"
+            className="flex-1 rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white hover:bg-indigo-700"
           >
             View My Complaints
           </button>
           <button
             onClick={() => router.push("/student/complaints/new")}
-            className="flex-1 rounded-lg bg-gray-300 px-4 py-3 font-semibold"
+            className="flex-1 rounded-lg bg-gray-300 px-4 py-3 font-semibold hover:bg-gray-400"
           >
             Submit Another
           </button>

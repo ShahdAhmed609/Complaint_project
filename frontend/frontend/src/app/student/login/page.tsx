@@ -1,4 +1,3 @@
-// src/app/login/page.tsx
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -9,54 +8,46 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/api/auth/login', {
-        email: email,
-        password: password,
-      });
-
-      const { token, role } = response.data;
+      const { data } = await axios.post('http://127.0.0.1:5000/api/auth/login', { email, password });
+      const { token, role } = data;
 
       if (token) {
-        // تخزين التوكن والـ role
+        localStorage.clear();
         localStorage.setItem('authToken', token);
-        localStorage.setItem('userRole', role);
+        localStorage.setItem('role', role);
 
         alert('Login Successful!');
-
-        // التوجيه حسب الـ role
-        if (role === "student") {
-          router.push('/student/dashboard');
-        } else if (role === "admin") {
-          router.push('/admin/dashboard');
-        }
+        role === "student" ? router.push('/student/dashboard') : router.push('/admin/dashboard');
       } else {
         setError('Login successful, but no token was provided.');
       }
     } catch (err: any) {
       console.error("Login Error:", err);
-
       if (err.code === "ERR_NETWORK") {
         setError('Network Error: Backend is not running. Using mock login for now.');
-
-        // Mock Login Logic
         if (email === 'user@test.com' && password === 'password123') {
+          localStorage.clear();
           localStorage.setItem('authToken', 'fake-token-for-testing');
-          localStorage.setItem('userRole', 'student'); // افتراضي طالب
+          localStorage.setItem('role', 'student');
           alert('Login Successful! (Test Mode)');
-          router.push('/complaints/new');
+          router.push('/student/dashboard');
         } else {
           setError('Invalid credentials. (Test Mode)');
         }
       } else {
         setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,9 +81,10 @@ export default function LoginPage() {
           {error && <p className="text-sm text-red-600 text-center">{error}</p>}
           <button
             type="submit"
-            className="flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white"
+            disabled={loading}
+            className="flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white disabled:opacity-50"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
           <p className="text-center text-sm">
             Don't have an account?

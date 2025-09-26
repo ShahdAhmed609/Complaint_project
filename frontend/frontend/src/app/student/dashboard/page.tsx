@@ -3,6 +3,8 @@ import { useRouter } from "next/navigation";
 
 export default function StudentDashboard() {
   const router = useRouter();
+  const buttonBase =
+    "w-full rounded-lg px-4 py-3 font-semibold text-white transition-colors";
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-slate-50 p-8">
@@ -13,16 +15,30 @@ export default function StudentDashboard() {
 
         <button
           onClick={() => router.push("/student/complaints/new")}
-          className="w-full rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white"
+          className={`${buttonBase} bg-indigo-600 hover:bg-indigo-700`}
         >
           Submit New Complaint
         </button>
 
         <button
           onClick={() => router.push("/student/complaints/my")}
-          className="w-full rounded-lg bg-green-600 px-4 py-3 font-semibold text-white"
+          className={`${buttonBase} bg-green-600 hover:bg-green-700`}
         >
           View My Complaints
+        </button>
+
+        <button
+          onClick={() => router.push("/student/suggestions/new")}
+          className={`${buttonBase} bg-purple-600 hover:bg-purple-700`}
+        >
+          Submit New Suggestion
+        </button>
+
+        <button
+          onClick={() => router.push("/student/suggestions/my")}
+          className={`${buttonBase} bg-pink-600 hover:bg-pink-700`}
+        >
+          View My Suggestions
         </button>
       </div>
     </main>

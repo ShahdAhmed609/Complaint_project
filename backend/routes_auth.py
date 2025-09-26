@@ -7,7 +7,9 @@ from flask_jwt_extended import create_access_token
 # blueprint for authentication
 auth_bp = Blueprint("auth", __name__)
 
+# --------------------------
 # route for register a new student
+# --------------------------
 @auth_bp.route("/register", methods=["POST"])
 def register_student():
     data = request.json
@@ -29,43 +31,41 @@ def register_student():
     return jsonify({"msg": "Student registered"}), 201
 
 
+# --------------------------
 # route for login student 
+# --------------------------
 @auth_bp.route("/login", methods=["POST"])
-def login():
+def student_login():
     data = request.json
     email, password = data["email"], data["password"]
 
-    user = Student.query.filter_by(email=email).first()
-    role = "student"
-    if not user:
-        user = Admin.query.filter_by(email=email).first()
-        role = "admin"
+    # check student only
+    student = Student.query.filter_by(email=email).first()
+    if not student or not check_password_hash(student.password, password):
+        return jsonify({"msg": "Invalid student credentials"}), 401
 
-    if not user or not check_password_hash(user.password, password):
-        return jsonify({"msg": "Invalid credentials"}), 401
-
-   
     token = create_access_token(
-        identity=str(user.id),  # sub = "21"
-        additional_claims={"role": role},
-        expires_delta=datetime.timedelta(days=1)  # token valid for 1 day
+        identity=str(student.id),
+        additional_claims={"role": "student"},
+        expires_delta=datetime.timedelta(days=1)
     )
 
-    # return token + role
-    return jsonify({"token": token, "role": role}), 200
+    return jsonify({"token": token, "role": "student"}), 200
 
+
+# --------------------------
 # route for admin login only
+# --------------------------
 @auth_bp.route("/admin/login", methods=["POST"])
 def admin_login():
     data = request.json
     email, password = data["email"], data["password"]
 
-    # check admin
+    # check admin only
     admin_user = Admin.query.filter_by(email=email).first()
     if not admin_user or not check_password_hash(admin_user.password, password):
         return jsonify({"msg": "Invalid admin credentials"}), 401
 
-    # token fo the admin
     token = create_access_token(
         identity=str(admin_user.id),
         additional_claims={"role": "admin"},
@@ -74,7 +74,10 @@ def admin_login():
 
     return jsonify({"token": token, "role": "admin"}), 200
 
+
+# --------------------------
 # route for testing protected route
+# --------------------------
 @auth_bp.route("/test-db")
 def test_db():
     try:

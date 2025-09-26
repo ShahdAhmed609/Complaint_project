@@ -4,10 +4,10 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from sqlalchemy import text 
 
-# import blueprints
 from routes_test import test_bp
 from routes_complaints import complaints_bp
 from routes_auth import auth_bp
+from routes_suggestions import suggestions_bp
 
 jwt = JWTManager()
 
@@ -43,6 +43,7 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(test_bp)
     app.register_blueprint(complaints_bp, url_prefix="/api/complaints")
+    app.register_blueprint(suggestions_bp, url_prefix="/api/suggestions")
 
     return app
 
