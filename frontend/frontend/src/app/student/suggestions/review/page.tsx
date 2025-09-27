@@ -1,64 +1,84 @@
+// src/app/student/suggestions/review/page.tsx
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+
+interface SuggestionData {
+  title: string;
+  department: string;
+  description: string;
+  fileName?: string;
+}
 
 export default function ReviewSuggestionPage() {
-  const [data, setData] = useState<{
-    title: string;
-    department: string;
-    description: string;
-    fileName?: string | null;
-  } | null>(null);
+  const [data, setData] = useState<SuggestionData | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const saved = sessionStorage.getItem("suggestionData");
-    if (!saved) {
+    // ✅ تحميل البيانات النصية من sessionStorage
+    const storedData = sessionStorage.getItem("suggestionData");
+    if (storedData) {
+      setData(JSON.parse(storedData));
+    } else {
       router.push("/student/suggestions");
       return;
     }
-    setData(JSON.parse(saved));
+
+    // ✅ تحميل الملف من sessionStorage (base64 → File)
+    const storedFile = sessionStorage.getItem("uploadedSuggestionFile");
+    if (storedFile) {
+      const parsed = JSON.parse(storedFile);
+      const byteString = atob(parsed.data.split(",")[1]);
+      const mimeString = parsed.type;
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++)
+        ia[i] = byteString.charCodeAt(i);
+      const newFile = new File([ab], parsed.name, { type: mimeString });
+      setFile(newFile);
+    }
   }, [router]);
 
   const handleSubmit = async () => {
     if (!data) return;
+
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      alert("⚠️ Session expired. Please log in again.");
+      router.push("/login");
+      return;
+    }
 
     try {
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("department", data.department);
       formData.append("description", data.description);
+      if (file) formData.append("file", file);
 
-      const fileData = sessionStorage.getItem("uploadedSuggestionFile");
-      if (fileData) {
-        const parsed = JSON.parse(fileData);
-        const byteString = atob(parsed.data.split(",")[1]);
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
-        }
-        const file = new File([ab], parsed.name, { type: parsed.type });
-        formData.append("file", file);
-      }
+      await axios.post(
+        "http://127.0.0.1:5000/api/suggestions/create",
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-      const token = localStorage.getItem("authToken");
-      const res = await fetch("http://127.0.0.1:5000/api/suggestions/create", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Failed to submit suggestion");
+      // ✅ مسح البيانات بعد الإرسال
+      sessionStorage.removeItem("suggestionData");
+      sessionStorage.removeItem("uploadedSuggestionFile");
 
       router.push("/student/suggestions/success");
-    } catch (err) {
-      console.error(err);
-      alert("❌ Failed to submit suggestion");
+    } catch (err: any) {
+      console.error("🔥 Submit Error:", err);
+      const message =
+        err.response?.data?.message || "❌ Failed to submit suggestion";
+      alert(message);
     }
   };
 
-  if (!data) return null;
+  if (!data) return <p>Loading...</p>;
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-slate-50 p-8">
@@ -66,25 +86,42 @@ export default function ReviewSuggestionPage() {
         <h1 className="mb-6 text-center text-3xl font-bold text-slate-800">
           Review Your Suggestion
         </h1>
-        <p><strong>Title:</strong> {data.title}</p>
-        <p><strong>Department:</strong> {data.department}</p>
-        <p><strong>Description:</strong> {data.description}</p>
-        {data.fileName && <p><strong>File:</strong> {data.fileName}</p>}
 
-        <div className="mt-6 flex justify-between">
+        <div className="space-y-4">
+          <div>
+            <h2 className="font-semibold text-slate-700">Title:</h2>
+            <p>{data.title}</p>
+          </div>
+
+          <div>
+            <h2 className="font-semibold text-slate-700">Department:</h2>
+            <p>{data.department}</p>
+          </div>
+
+          <div>
+            <h2 className="font-semibold text-slate-700">Description:</h2>
+            <p>{data.description}</p>
+          </div>
+
+          <div>
+            <h2 className="font-semibold text-slate-700">File:</h2>
+            <p>{file ? file.name : "No file attached"}</p>
+          </div>
+        </div>
+
+        <div className="mt-8 flex justify-between gap-4">
           <button
-            type="button"
-            onClick={() => router.push("/student/suggestions")}
-            className="rounded bg-gray-300 px-4 py-2 hover:bg-gray-400"
+            onClick={() => router.back()}
+            className="flex-1 rounded-lg bg-gray-300 px-4 py-3 font-semibold hover:bg-gray-400"
           >
-            Edit
+            Back to Edit
           </button>
+
           <button
-            type="button"
             onClick={handleSubmit}
-            className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+            className="flex-1 rounded-lg bg-green-600 px-4 py-3 font-semibold text-white hover:bg-green-700"
           >
-            Confirm
+            Confirm & Submit
           </button>
         </div>
       </div>
