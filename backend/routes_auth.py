@@ -74,16 +74,3 @@ def admin_login():
 
     return jsonify({"token": token, "role": "admin"}), 200
 
-
-# --------------------------
-# route for testing protected route
-# --------------------------
-@auth_bp.route("/test-db")
-def test_db():
-    try:
-        student = Student(name="TestUser", email="testuser@example.com", password="12345")
-        db.session.add(student)
-        db.session.commit()
-        return "Database connected and data inserted successfully!"
-    except Exception as e:
-        return f"Error: {e}"

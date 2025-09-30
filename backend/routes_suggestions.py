@@ -114,23 +114,6 @@ def reply_suggestion(id):
     db.session.commit()
     return jsonify({"msg": "Reply saved"})
 
-@suggestions_bp.route("/upload-temp", methods=["POST"])
-@jwt_required()
-def upload_temp_suggestion():
-    if "file" not in request.files:
-        return jsonify({"msg": "No file provided"}), 400
-
-    file = request.files["file"]
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        upload_folder = current_app.config.get("UPLOAD_FOLDER", "uploads")
-        os.makedirs(upload_folder, exist_ok=True)
-        path = os.path.join(upload_folder, filename)
-        file.save(path)
-        return jsonify({"fileUrl": f"/api/suggestions/files/{filename}"}), 200
-
-    return jsonify({"msg": "Invalid file"}), 400
-
 @suggestions_bp.route("/files/<filename>", methods=["GET"])
 def get_suggestion_file(filename):
     upload_folder = current_app.config.get("UPLOAD_FOLDER", "uploads")
