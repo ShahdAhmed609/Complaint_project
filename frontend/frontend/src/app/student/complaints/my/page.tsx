@@ -55,9 +55,9 @@ export default function MyComplaintsPage() {
               key={c.id}
               className="rounded-lg border border-gray-200 p-4 shadow-sm"
             >
-              <h2 className="text-xl font-semibold">{c.title}</h2>
+              <h2 className="text-xl text-black font-semibold">{c.title}</h2>
               <p className="text-sm text-gray-600">Dept: {c.department}</p>
-              <p className="mt-2">{c.description}</p>
+              <p className="mt-2 text-black">{c.description}</p>
               {c.suggestion && (
                 <p className="mt-2 text-sm text-gray-700">
                   Suggestion: {c.suggestion}
@@ -73,7 +73,7 @@ export default function MyComplaintsPage() {
                   View Attachment
                 </a>
               )}
-              <p className="mt-2 text-sm font-medium">
+              <p className="mt-2 text-black text-sm font-medium">
                 Status:{" "}
                 <span
                   className={

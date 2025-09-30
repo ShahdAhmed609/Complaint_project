@@ -40,7 +40,7 @@ export default function AdminComplaintsPage() {
 
   return (
     <div className="max-w-6xl mx-auto mt-10 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">All Complaints</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center text-black">All Complaints</h1>
 
       {complaints.length === 0 ? (
         <p className="text-center text-gray-500">No complaints available.</p>
@@ -49,21 +49,21 @@ export default function AdminComplaintsPage() {
           <table className="min-w-full bg-white border border-gray-200">
             <thead className="bg-gray-100">
               <tr>
-                <th className="py-3 px-4 border-b">Title</th>
-                <th className="py-3 px-4 border-b">Student</th>
-                <th className="py-3 px-4 border-b">Department</th>
-                <th className="py-3 px-4 border-b">Status</th>
-                <th className="py-3 px-4 border-b">Action</th>
+                <th className="py-3 px-4 border-b text-black">Title</th>
+                <th className="py-3 px-4 border-b text-black">Student</th>
+                <th className="py-3 px-4 border-b text-black">Department</th>
+                <th className="py-3 px-4 border-b text-black">Status</th>
+                <th className="py-3 px-4 border-b text-black">Action</th>
               </tr>
             </thead>
             <tbody>
               {complaints.map((c) => (
                 <tr key={c.id} className="hover:bg-gray-50">
-                  <td className="py-3 px-4 border-b">{c.title}</td>
-                  <td className="py-3 px-4 border-b">{c.student_id}</td>
-                  <td className="py-3 px-4 border-b">{c.department}</td>
-                  <td className="py-3 px-4 border-b">{c.status}</td>
-                  <td className="py-3 px-4 border-b">
+                  <td className="py-3 px-4 border-b text-black">{c.title}</td>
+                  <td className="py-3 px-4 border-b text-black">{c.student_id}</td>
+                  <td className="py-3 px-4 border-b text-black">{c.department}</td>
+                  <td className="py-3 px-4 border-b text-black">{c.status}</td>
+                  <td className="py-3 px-4 border-b text-black">
                     <Link
                       href={`/admin/complaints/${c.id}`}
                       className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"

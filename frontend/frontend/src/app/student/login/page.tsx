@@ -51,49 +51,52 @@ export default function LoginPage() {
     }
   };
 
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-purple-100 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
-        <h1 className="text-center text-3xl font-bold text-slate-800">Welcome Back!</h1>
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          <div>
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-            />
-          </div>
-          {error && <p className="text-sm text-red-600 text-center">{error}</p>}
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white disabled:opacity-50"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-          <p className="text-center text-sm">
-            Don't have an account?
-            <Link href="/student/register" className="font-medium text-indigo-600 ml-1">
-              Register Now
-            </Link>
-          </p>
-        </form>
-      </div>
-    </main>
-  );
+ return (
+  <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-purple-100 p-4">
+    <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+      <h1 className="text-center text-3xl font-bold text-slate-800">Welcome Back!</h1>
+      <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+        <div>
+          <label htmlFor="email" className="block text-black font-medium">Email</label>
+          <input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="mt-1 block w-full p-2 border rounded text-black placeholder-grey shadow-sm"
+            placeholder="Enter your email"
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className="block text-black font-medium">Password</label>
+          <input
+            id="password"
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="mt-1 block w-full p-2 border rounded text-black placeholder-grey shadow-sm"
+            placeholder="Enter your password"
+          />
+        </div>
+        {error && <p className="text-sm text-red-600 text-center">{error}</p>}
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white disabled:opacity-50"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+        <p className="text-center text-black text-sm">
+          Don't have an account?
+          <Link href="/student/register" className="font-medium text-indigo-600 ml-1">
+            Register Now
+          </Link>
+        </p>
+      </form>
+    </div>
+  </main>
+);
+
 }

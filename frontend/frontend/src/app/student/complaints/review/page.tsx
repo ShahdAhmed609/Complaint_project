@@ -84,44 +84,45 @@ export default function ReviewComplaintPage() {
   if (!data) return <p>Loading...</p>;
 
   return (
-    <main className="flex min-h-screen flex-col items-center bg-slate-50 p-8">
-      <div className="w-full max-w-2xl rounded-xl bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-3xl font-bold text-slate-800">
-          Review Submission
-        </h1>
-        <div className="space-y-4">
-          <div>
-            <h2>Title:</h2>
-            <p>{data.title}</p>
-          </div>
-          <div>
-            <h2>Department:</h2>
-            <p>{data.department}</p>
-          </div>
-          <div>
-            <h2>Description:</h2>
-            <p>{data.description}</p>
-          </div>
-          <div>
-            <h2>File:</h2>
-            <p>{file ? file.name : "No file attached"}</p>
-          </div>
+  <main className="flex min-h-screen flex-col items-center bg-slate-50 p-8">
+    <div className="w-full max-w-2xl rounded-xl bg-white p-8 shadow-md">
+      <h1 className="mb-6 text-center text-3xl font-bold text-slate-800">
+        Review Submission
+      </h1>
+      <div className="space-y-4">
+        <div>
+          <h2 className="font-semibold text-black">Title:</h2>
+          <p className="text-black">{data.title}</p>
         </div>
-        <div className="mt-8 flex justify-between gap-4">
-          <button
-            onClick={() => router.back()}
-            className="flex-1 rounded-lg bg-gray-300 px-4 py-3 font-semibold"
-          >
-            Back to Edit
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="flex-1 rounded-lg bg-green-600 px-4 py-3 font-semibold text-white"
-          >
-            Confirm & Submit
-          </button>
+        <div>
+          <h2 className="font-semibold text-black">Department:</h2>
+          <p className="text-black">{data.department}</p>
+        </div>
+        <div>
+          <h2 className="font-semibold text-black">Description:</h2>
+          <p className="text-black">{data.description}</p>
+        </div>
+        <div>
+          <h2 className="font-semibold text-black">File:</h2>
+          <p className="text-black">{file ? file.name : "No file attached"}</p>
         </div>
       </div>
-    </main>
-  );
+      <div className="mt-8 flex justify-between gap-4">
+        <button
+          onClick={() => router.back()}
+          className="flex-1 rounded-lg bg-gray-300 px-4 py-3 font-semibold"
+        >
+          Back to Edit
+        </button>
+        <button
+          onClick={handleSubmit}
+          className="flex-1 rounded-lg bg-green-600 px-4 py-3 font-semibold text-white"
+        >
+          Confirm & Submit
+        </button>
+      </div>
+    </div>
+  </main>
+);
+
 }

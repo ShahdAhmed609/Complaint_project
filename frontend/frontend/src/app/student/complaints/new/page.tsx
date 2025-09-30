@@ -70,14 +70,14 @@ export default function NewComplaintPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title"
-            className="block w-full rounded-md border-gray-300 shadow-sm"
+            className="block w-full border rounded text-black placeholder-grey shadow-sm"
           />
 
           <select
             required
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm"
+            className="block w-full border rounded text-black placeholder-grey shadow-sm"
           >
             <option value="" disabled>
               Select a department
@@ -92,7 +92,7 @@ export default function NewComplaintPage() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Description"
-            className="block w-full rounded-md border-gray-300 shadow-sm"
+            className="block w-full border rounded text-black placeholder-grey shadow-sm"
           ></textarea>
 
           <input

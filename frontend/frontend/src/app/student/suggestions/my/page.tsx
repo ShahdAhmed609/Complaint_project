@@ -71,9 +71,9 @@ export default function MySuggestionsPage() {
               key={s.id}
               className="rounded-lg border border-gray-200 p-4 shadow-sm"
             >
-              <h2 className="text-xl font-semibold">{s.title}</h2>
+              <h2 className="text-xl text-black font-semibold">{s.title}</h2>
               <p className="text-sm text-gray-600">Dept: {s.department}</p>
-              <p className="mt-2">{s.description}</p>
+              <p className="mt-2 text-black">{s.description}</p>
               {s.file_path && (
                 <a
                   href={`http://127.0.0.1:5000/api/suggestions/files/${s.file_path.split("/").pop()}`}
@@ -83,7 +83,7 @@ export default function MySuggestionsPage() {
                   View Attachment
                 </a>
               )}
-              <p className="mt-2 text-sm font-medium">
+              <p className="mt-2 text-black text-sm font-medium">
                 Status:{" "}
                 <span className={getStatusColor(s.status)}>{s.status}</span>
               </p>

@@ -85,18 +85,18 @@ export default function AdminSuggestionsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold mb-4">All Suggestions</h1>
+      <h1 className="text-2xl font-bold mb-4 text-black">All Suggestions</h1>
       {suggestions.map((s) => (
         <div key={s.id} className="bg-white p-4 rounded shadow space-y-2">
-          <p><strong>Title:</strong> {s.title}</p>
-          <p><strong>Student ID:</strong> {s.student_id}</p>
-          <p><strong>Department:</strong> {s.department}</p>
-          <p><strong>Description:</strong> {s.description}</p>
-          <p><strong>Status:</strong> {s.status}</p>
-          <p><strong>Reply:</strong> {s.admin_reply || "No reply yet"}</p>
+          <p className="text-black"><strong>Title:</strong> {s.title}</p>
+          <p className="text-black"><strong>Student ID:</strong> {s.student_id}</p>
+          <p className="text-black"><strong>Department:</strong> {s.department}</p>
+          <p className="text-black"><strong>Description:</strong> {s.description}</p>
+          <p className="text-black"><strong>Status:</strong> {s.status}</p>
+          <p className="text-black"><strong>Reply:</strong> {s.admin_reply || "No reply yet"}</p>
 
           {s.file_path && (
-            <p>
+            <p className="text-black">
               <strong>File:</strong>{" "}
               <a
                 href={`http://127.0.0.1:5000/api/suggestions/files/${s.file_path}`}
@@ -113,13 +113,13 @@ export default function AdminSuggestionsPage() {
             placeholder="Write your reply here"
             value={replyText[s.id]}
             onChange={(e) => handleReplyChange(s.id, e.target.value)}
-            className="w-full border rounded p-2"
+            className="w-full border rounded text-black placeholder-grey shadow-sm"
           />
 
           <select
             value={statusText[s.id]}
             onChange={(e) => handleStatusChange(s.id, e.target.value)}
-            className="w-full mt-2 border rounded p-2"
+            className="w-full border rounded text-black placeholder-grey shadow-sm"
           >
             <option value="under review">Under Review</option>
             <option value="accepted">Accepted</option>

@@ -89,23 +89,23 @@ export default function ReviewSuggestionPage() {
 
         <div className="space-y-4">
           <div>
-            <h2 className="font-semibold text-slate-700">Title:</h2>
-            <p>{data.title}</p>
+            <h2 className="font-semibold text-black">Title:</h2>
+            <p className="text-black">{data.title}</p>
           </div>
 
           <div>
-            <h2 className="font-semibold text-slate-700">Department:</h2>
-            <p>{data.department}</p>
+            <h2 className="font-semibold text-black">Department:</h2>
+            <p className="text-black">{data.department}</p>
           </div>
 
           <div>
-            <h2 className="font-semibold text-slate-700">Description:</h2>
-            <p>{data.description}</p>
+            <h2 className="font-semibold text-black">Description:</h2>
+            <p className="text-black">{data.description}</p>
           </div>
 
           <div>
-            <h2 className="font-semibold text-slate-700">File:</h2>
-            <p>{file ? file.name : "No file attached"}</p>
+            <h2 className="font-semibold text-black">File:</h2>
+            <p className="text-black">{file ? file.name : "No file attached"}</p>
           </div>
         </div>
 

@@ -52,12 +52,12 @@ export default function ComplaintDetails() {
 
   return (
     <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Complaint Details</h1>
-      <p><strong>Title:</strong> {complaint.title}</p>
-      <p><strong>Description:</strong> {complaint.description}</p>
-      <p><strong>Department:</strong> {complaint.department}</p>
-      <p><strong>Suggestion:</strong> {complaint.suggestion || "N/A"}</p>
-      <p><strong>Status:</strong> {complaint.status}</p>
+      <h1 className="text-2xl font-bold mb-4 text-black">Complaint Details</h1>
+      <p className="text-black"><strong>Title:</strong> {complaint.title}</p>
+      <p className="text-black"><strong>Description:</strong> {complaint.description}</p>
+      <p className="text-black"><strong>Department:</strong> {complaint.department}</p>
+      <p className="text-black"><strong>Suggestion:</strong> {complaint.suggestion || "N/A"}</p>
+      <p className="text-black"><strong>Status:</strong> {complaint.status}</p>
 
       {fileUrl && (
         <div className="mt-4">
@@ -83,20 +83,20 @@ export default function ComplaintDetails() {
 
       <form onSubmit={handleReply} className="mt-6 space-y-4">
         <div>
-          <label className="block font-medium">Reply</label>
+          <label className="block font-medium text-black">Reply</label>
           <textarea
             value={reply}
             onChange={(e) => setReply(e.target.value)}
-            className="w-full border rounded p-2"
+            className="w-full border rounded p-2 text-black placeholder-grey shadow-sm"
             rows="4"
           />
         </div>
         <div>
-          <label className="block font-medium">Status</label>
+          <label className="block font-medium text-black">Status</label>
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="w-full border rounded p-2"
+            className="w-full border rounded p-2 text-black placeholder-grey shadow-sm"
           >
             <option value="pending">Pending</option>
             <option value="resolved">Resolved</option>
