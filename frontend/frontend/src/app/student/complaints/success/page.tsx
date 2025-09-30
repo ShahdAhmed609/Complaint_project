@@ -21,10 +21,10 @@ export default function SuccessPage() {
             View My Complaints
           </button>
           <button
-            onClick={() => router.push("/student/complaints/new")}
+            onClick={() => router.push("/student/dashboard")}
             className="flex-1 rounded-lg bg-gray-300 px-4 py-3 font-semibold hover:bg-gray-400"
           >
-            Submit Another
+            Back to Dashboard
           </button>
         </div>
       </div>
