@@ -19,13 +19,8 @@ export default function AdminLogin() {
       });
 
       if (res.data && res.data.token) {
-        // 🧹 امسح أي بيانات قديمة (طالب مثلاً)
-        localStorage.clear();
-
-        // 🎯 خزّن بيانات الأدمن
         localStorage.setItem("adminToken", res.data.token);
-        localStorage.setItem("role", "admin");
-
+        localStorage.setItem("adminRole", "admin");
         router.push("/admin"); 
       } else {
         setError("Invalid login response from server");

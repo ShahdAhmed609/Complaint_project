@@ -10,7 +10,7 @@ export default function AdminComplaintsPage() {
   // Fetch all complaints
   useEffect(() => {
     const fetchComplaints = async () => {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("adminToken"); // ✅ جبت التوكن بتاع الأدمن
       try {
         const res = await fetch("http://127.0.0.1:5000/api/complaints/all", {
           headers: { Authorization: `Bearer ${token}` },
@@ -47,7 +47,7 @@ export default function AdminComplaintsPage() {
   };
 
   const handleSubmitReply = async (id) => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("adminToken"); // ✅ برده استخدمت adminToken
     try {
       const res = await fetch(`http://127.0.0.1:5000/api/complaints/${id}/reply`, {
         method: "POST",

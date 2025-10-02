@@ -42,7 +42,7 @@ export default function ReviewSuggestionPage() {
   const handleSubmit = async () => {
     if (!data) return;
 
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("studentToken");
     if (!token) {
       alert("⚠️ Session expired. Please log in again.");
       router.replace("/login");

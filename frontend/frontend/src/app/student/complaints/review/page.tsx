@@ -55,7 +55,7 @@ export default function ReviewComplaintPage() {
         formData.append("file", file); // ✅ الملف الحقيقي يتبعت هنا
       }
 
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("studentToken");
 
       const res = await fetch("http://127.0.0.1:5000/api/complaints/create", {
         method: "POST",

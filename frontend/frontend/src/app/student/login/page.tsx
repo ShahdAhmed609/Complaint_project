@@ -21,12 +21,11 @@ export default function LoginPage() {
       const { token, role } = data;
 
       if (token) {
-        localStorage.clear();
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('role', role);
+        localStorage.setItem('studentToken', token);
+        localStorage.setItem('studentRole', role);
 
         alert('Login Successful!');
-        role === "student" ? router.push('/student/dashboard') : router.push('/admin/dashboard');
+        router.push('/student/dashboard');
       } else {
         setError('Login successful, but no token was provided.');
       }
@@ -35,9 +34,8 @@ export default function LoginPage() {
       if (err.code === "ERR_NETWORK") {
         setError('Network Error: Backend is not running. Using mock login for now.');
         if (email === 'user@test.com' && password === 'password123') {
-          localStorage.clear();
-          localStorage.setItem('authToken', 'fake-token-for-testing');
-          localStorage.setItem('role', 'student');
+          localStorage.setItem('studentToken', 'fake-token-for-testing');
+          localStorage.setItem('studentRole', 'student');
           alert('Login Successful! (Test Mode)');
           router.push('/student/dashboard');
         } else {

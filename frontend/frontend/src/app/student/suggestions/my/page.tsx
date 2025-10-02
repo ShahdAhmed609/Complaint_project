@@ -18,7 +18,7 @@ export default function MySuggestionsPage() {
   useEffect(() => {
     const fetchSuggestions = async () => {
       try {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("studentToken");
         if (!token) throw new Error("No auth token found");
 
         const res = await fetch("http://127.0.0.1:5000/api/suggestions/my", {

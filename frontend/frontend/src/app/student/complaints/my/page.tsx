@@ -20,7 +20,7 @@ export default function MyComplaintsPage() {
   useEffect(() => {
     const fetchComplaints = async () => {
       try {
-        const token = localStorage.getItem("authToken");
+        const token = localStorage.getItem("studentToken");
         const { data } = await axios.get<Complaint[]>(
           "http://127.0.0.1:5000/api/complaints/my",
           {
