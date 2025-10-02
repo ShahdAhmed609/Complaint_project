@@ -18,16 +18,14 @@ export default function ReviewSuggestionPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // ✅ تحميل البيانات النصية من sessionStorage
     const storedData = sessionStorage.getItem("suggestionData");
     if (storedData) {
       setData(JSON.parse(storedData));
     } else {
-      router.push("/student/suggestions");
+      router.replace("/student/suggestions/new");
       return;
     }
 
-    // ✅ تحميل الملف من sessionStorage (base64 → File)
     const storedFile = sessionStorage.getItem("uploadedSuggestionFile");
     if (storedFile) {
       const parsed = JSON.parse(storedFile);
@@ -35,8 +33,7 @@ export default function ReviewSuggestionPage() {
       const mimeString = parsed.type;
       const ab = new ArrayBuffer(byteString.length);
       const ia = new Uint8Array(ab);
-      for (let i = 0; i < byteString.length; i++)
-        ia[i] = byteString.charCodeAt(i);
+      for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
       const newFile = new File([ab], parsed.name, { type: mimeString });
       setFile(newFile);
     }
@@ -48,7 +45,7 @@ export default function ReviewSuggestionPage() {
     const token = localStorage.getItem("authToken");
     if (!token) {
       alert("⚠️ Session expired. Please log in again.");
-      router.push("/login");
+      router.replace("/login");
       return;
     }
 
@@ -65,11 +62,10 @@ export default function ReviewSuggestionPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // ✅ مسح البيانات بعد الإرسال
       sessionStorage.removeItem("suggestionData");
       sessionStorage.removeItem("uploadedSuggestionFile");
 
-      router.push("/student/suggestions/success");
+      router.replace("/student/suggestions/success");
     } catch (err: any) {
       console.error("🔥 Submit Error:", err);
       const message =
