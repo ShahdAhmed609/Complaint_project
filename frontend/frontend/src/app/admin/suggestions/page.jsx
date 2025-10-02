@@ -1,140 +1,97 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import axios from "axios";
 
 export default function AdminSuggestionsPage() {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [replyText, setReplyText] = useState({});
-  const [statusText, setStatusText] = useState({});
+  const [error, setError] = useState("");
 
-  // Fetch all suggestions
-  useEffect(() => {
-    const fetchSuggestions = async () => {
-      const token = localStorage.getItem("adminToken"); // ✅ استخدم توكن الأدمن
+  const API_URL = "http://127.0.0.1:5000/api/suggestions/all";
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("adminToken");
       if (!token) {
-        alert("Unauthorized! Please login as admin.");
+        setError("Admin token not found. Please login again.");
+        setLoading(false);
         return;
       }
 
-      try {
-        const res = await fetch("http://127.0.0.1:5000/api/suggestions/all", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        setSuggestions(data);
-
-        // Initialize reply & status states
-        const initialReply = {};
-        const initialStatus = {};
-        data.forEach((s) => {
-          initialReply[s.id] = s.admin_reply || "";
-          initialStatus[s.id] = s.status || "under review";
-        });
-        setReplyText(initialReply);
-        setStatusText(initialStatus);
-
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSuggestions();
-  }, []);
-
-  const handleReplyChange = (id, value) => {
-    setReplyText((prev) => ({ ...prev, [id]: value }));
-  };
-
-  const handleStatusChange = (id, value) => {
-    setStatusText((prev) => ({ ...prev, [id]: value }));
-  };
-
-  const handleSubmitReply = async (id) => {
-    const token = localStorage.getItem("adminToken"); // ✅ برضو هنا
-    try {
-      const res = await fetch(`http://127.0.0.1:5000/api/suggestions/${id}/reply`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          admin_reply: replyText[id],
-          status: statusText[id],
-        }),
+      const res = await axios.get(API_URL, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Failed to send reply");
 
-      // Update state after successful reply
-      setSuggestions((prev) =>
-        prev.map((s) =>
-          s.id === id ? { ...s, admin_reply: replyText[id], status: statusText[id] } : s
-        )
-      );
+      // ترتيب الاقتراحات حسب الحالة أولًا ثم الأحدث
+      const statusOrder = { "under review": 1, accepted: 2, rejected: 3 };
+      const sortedSuggestions = res.data.sort((a, b) => {
+        if (statusOrder[a.status] !== statusOrder[b.status]) {
+          return statusOrder[a.status] - statusOrder[b.status];
+        }
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
 
-      alert("✅ Reply sent successfully!");
+      setSuggestions(sortedSuggestions);
     } catch (err) {
       console.error(err);
-      alert("❌ Failed to send reply");
+      setError("Failed to fetch suggestions. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) return <p>Loading suggestions...</p>;
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (loading) return <p className="text-center mt-10">Loading suggestions…</p>;
+  if (error) return <p className="text-center mt-10 text-red-600">{error}</p>;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold mb-4 text-black">All Suggestions</h1>
-      {suggestions.map((s) => (
-        <div key={s.id} className="bg-white p-4 rounded shadow space-y-2">
-          <p className="text-black"><strong>Title:</strong> {s.title}</p>
-          <p className="text-black"><strong>Student ID:</strong> {s.student_id}</p>
-          <p className="text-black"><strong>Department:</strong> {s.department}</p>
-          <p className="text-black"><strong>Description:</strong> {s.description}</p>
-          <p className="text-black"><strong>Status:</strong> {s.status}</p>
-          <p className="text-black"><strong>Reply:</strong> {s.admin_reply || "No reply yet"}</p>
+    <div className="max-w-6xl mx-auto mt-10 px-4">
+      <h1 className="text-3xl font-bold mb-6 text-center text-black">All Suggestions</h1>
 
-          {s.file_path && (
-            <p className="text-black">
-              <strong>File:</strong>{" "}
-              <a
-                href={`http://127.0.0.1:5000/api/suggestions/files/${s.file_path}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 underline"
-              >
-                {s.file_path}
-              </a>
-            </p>
-          )}
-
-          <textarea
-            placeholder="Write your reply here"
-            value={replyText[s.id]}
-            onChange={(e) => handleReplyChange(s.id, e.target.value)}
-            className="w-full border rounded text-black placeholder-grey shadow-sm"
-          />
-
-          <select
-            value={statusText[s.id]}
-            onChange={(e) => handleStatusChange(s.id, e.target.value)}
-            className="w-full border rounded text-black placeholder-grey shadow-sm"
-          >
-            <option value="under review">Under Review</option>
-            <option value="accepted">Accepted</option>
-            <option value="rejected">Rejected</option>
-          </select>
-
-          <button
-            onClick={() => handleSubmitReply(s.id)}
-            className="mt-2 bg-green-600 text-white px-4 py-2 rounded"
-          >
-            Send Reply
-          </button>
+      {suggestions.length === 0 ? (
+        <p className="text-center text-gray-500">No suggestions available.</p>
+      ) : (
+        <div className="overflow-x-auto shadow rounded-lg">
+          <table className="min-w-full bg-white border border-gray-200">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="py-3 px-4 border-b text-black">Title</th>
+                <th className="py-3 px-4 border-b text-black">Student</th>
+                <th className="py-3 px-4 border-b text-black">Department</th>
+                <th className="py-3 px-4 border-b text-black">Status</th>
+                <th className="py-3 px-4 border-b text-black">Created At</th>
+                <th className="py-3 px-4 border-b text-black">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {suggestions.map((s) => (
+                <tr key={s.id} className="hover:bg-gray-50">
+                  <td className="py-3 px-4 border-b text-black">{s.title}</td>
+                  <td className="py-3 px-4 border-b text-black">{s.student_id}</td>
+                  <td className="py-3 px-4 border-b text-black">{s.department}</td>
+                  <td className="py-3 px-4 border-b text-black">{s.status}</td>
+                  <td className="py-3 px-4 border-b text-black">
+                    {new Date(s.created_at).toLocaleString()}
+                  </td>
+                  <td className="py-3 px-4 border-b text-black">
+                    <Link
+                      href={`/admin/suggestions/${s.id}`}
+                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                      View / Manage
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      ))}
+      )}
     </div>
   );
 }
-//

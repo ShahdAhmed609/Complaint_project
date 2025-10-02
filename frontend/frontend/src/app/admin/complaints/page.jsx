@@ -19,10 +19,21 @@ export default function AdminComplaintsPage() {
         setLoading(false);
         return;
       }
+
       const res = await axios.get(API_URL, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setComplaints(res.data);
+
+      // ترتيب حسب الحالة أولًا، وبعدها الأحدث
+      const statusOrder = { pending: 1, resolved: 2, terminated: 3 };
+      const sortedComplaints = res.data.sort((a, b) => {
+        if (statusOrder[a.status] !== statusOrder[b.status]) {
+          return statusOrder[a.status] - statusOrder[b.status];
+        }
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+
+      setComplaints(sortedComplaints);
     } catch (err) {
       console.error(err);
       setError("Failed to fetch complaints. Please try again.");
@@ -53,6 +64,7 @@ export default function AdminComplaintsPage() {
                 <th className="py-3 px-4 border-b text-black">Student</th>
                 <th className="py-3 px-4 border-b text-black">Department</th>
                 <th className="py-3 px-4 border-b text-black">Status</th>
+                <th className="py-3 px-4 border-b text-black">Created At</th>
                 <th className="py-3 px-4 border-b text-black">Action</th>
               </tr>
             </thead>
@@ -63,6 +75,9 @@ export default function AdminComplaintsPage() {
                   <td className="py-3 px-4 border-b text-black">{c.student_id}</td>
                   <td className="py-3 px-4 border-b text-black">{c.department}</td>
                   <td className="py-3 px-4 border-b text-black">{c.status}</td>
+                  <td className="py-3 px-4 border-b text-black">
+                    {new Date(c.created_at).toLocaleString()}
+                  </td>
                   <td className="py-3 px-4 border-b text-black">
                     <Link
                       href={`/admin/complaints/${c.id}`}

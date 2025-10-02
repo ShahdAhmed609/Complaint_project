@@ -96,7 +96,8 @@ def all_complaints():
             "suggestion": c.suggestion,
             "file_path": c.file_path,
             "status": c.status,
-            "reply": c.reply
+            "reply": c.reply,
+            "created_at": c.created_at.isoformat() 
         } for c in comps
     ])
 

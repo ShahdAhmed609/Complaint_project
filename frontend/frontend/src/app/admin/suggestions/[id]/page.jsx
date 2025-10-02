@@ -3,33 +3,30 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 
-export default function ComplaintDetails() {
+export default function SuggestionDetails() {
   const { id } = useParams();
   const router = useRouter();
-  const [complaint, setComplaint] = useState(null);
+  const [suggestion, setSuggestion] = useState(null);
   const [reply, setReply] = useState("");
-  const [status, setStatus] = useState("pending");
+  const [status, setStatus] = useState("under review");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    const fetchComplaint = async () => {
+    const fetchSuggestion = async () => {
       try {
         const token = localStorage.getItem("adminToken");
-        const res = await axios.get("http://127.0.0.1:5000/api/complaints/all", {
+        const res = await axios.get("http://127.0.0.1:5000/api/suggestions/all", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const found = res.data.find((c) => c.id == id);
-        setComplaint(found);
-        if (found) {
-          setStatus(found.status);
-          setReply(found.reply || "");
-        }
+        const found = res.data.find((s) => s.id == id);
+        setSuggestion(found);
+        if (found) setStatus(found.status);
       } catch {
-        setError("Failed to load complaint.");
+        setError("Failed to load suggestion.");
       }
     };
-    fetchComplaint();
+    fetchSuggestion();
   }, [id]);
 
   const handleReply = async (e) => {
@@ -37,39 +34,39 @@ export default function ComplaintDetails() {
     try {
       const token = localStorage.getItem("adminToken");
       await axios.post(
-        `http://127.0.0.1:5000/api/complaints/${id}/reply`,
-        { reply, status },
+        `http://127.0.0.1:5000/api/suggestions/${id}/reply`,
+        { admin_reply: reply, status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setSuccess("Reply saved successfully.");
-      // تحديث الرد في الصفحة بعد الحفظ
-      setComplaint({ ...complaint, reply, status });
+      router.push("/admin/suggestions");
     } catch {
       setError("Failed to save reply.");
     }
   };
 
-  if (!complaint) return <p className="text-center mt-10">Loading complaint…</p>;
+  if (!suggestion) return <p className="text-center mt-10">Loading suggestion…</p>;
 
-  const fileUrl = complaint.file_path
-    ? `http://127.0.0.1:5000/api/complaints/files/${complaint.file_path}`
+  const fileUrl = suggestion.file_path
+    ? `http://127.0.0.1:5000/api/suggestions/files/${suggestion.file_path}`
     : null;
 
   return (
     <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded shadow">
-      <h1 className="text-2xl font-bold mb-4 text-black">Complaint Details</h1>
-      <p className="text-black"><strong>Title:</strong> {complaint.title}</p>
-      <p className="text-black"><strong>Description:</strong> {complaint.description}</p>
-      <p className="text-black"><strong>Department:</strong> {complaint.department}</p>
-      <p className="text-black"><strong>Suggestion:</strong> {complaint.suggestion || "N/A"}</p>
-      <p className="text-black"><strong>Status:</strong> {complaint.status}</p>
-      <p className="text-black"><strong>Admin Reply:</strong> {complaint.reply || "N/A"}</p>
+      <h1 className="text-2xl font-bold mb-4 text-black">Suggestion Details</h1>
+      <p className="text-black"><strong>Title:</strong> {suggestion.title}</p>
+      <p className="text-black"><strong>Description:</strong> {suggestion.description}</p>
+      <p className="text-black"><strong>Department:</strong> {suggestion.department}</p>
+      <p className="text-black"><strong>Status:</strong> {suggestion.status}</p>
+      <p className="text-black"><strong>Admin Reply:</strong> {suggestion.admin_reply || "N/A"}</p>
 
       {fileUrl && (
         <div className="mt-4">
-          <p className="font-medium">📎 Attachment:</p>
           {/\.(jpg|jpeg|png|gif)$/i.test(fileUrl) ? (
-            <img src={fileUrl} alt="Attachment" className="mt-2 max-h-64 border rounded" />
+            <img
+              src={fileUrl}
+              alt="Attachment"
+              className="mt-2 max-h-64 border rounded"
+            />
           ) : (
             <a
               href={fileUrl}
@@ -100,15 +97,15 @@ export default function ComplaintDetails() {
             onChange={(e) => setStatus(e.target.value)}
             className="w-full border rounded p-2 text-black placeholder-grey shadow-sm"
           >
-            <option value="pending">Pending</option>
-            <option value="resolved">Resolved</option>
-            <option value="terminated">Terminated</option>
+            <option value="under review">Under Review</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
           </select>
         </div>
         <div className="flex justify-between items-center">
           <button
             type="button"
-            onClick={() => router.push("/admin/complaints")}
+            onClick={() => router.push("/admin/suggestions")}
             className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
           >
             ← Back to Dashboard

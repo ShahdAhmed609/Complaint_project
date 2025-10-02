@@ -67,7 +67,7 @@ def my_suggestions():
             "file_path": s.file_path,
             "status": s.status,
             "admin_reply": s.admin_reply,
-            "created_at": s.created_at
+            "created_at": s.created_at.isoformat()
         } for s in sugs
     ])
 
