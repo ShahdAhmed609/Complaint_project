@@ -33,7 +33,6 @@ def create_app():
         try:
             db.session.execute(text("SELECT 1"))
             print("✅ Database connected successfully!")
-            db.create_all()
         except Exception as e:
             print("❌ Database connection failed:", e)
 
