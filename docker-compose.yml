@@ -1,0 +1,43 @@
+services:
+  complaint_db:
+    image: postgres:16
+    container_name: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 2023
+      POSTGRES_DB: complaint_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  complaint_backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: complaint_backend
+    command: ["./wait-for-db.sh", "db", "python", "app.py"]
+    volumes:
+      - ./backend:/app
+    ports:
+      - "5000:5000"
+    depends_on:
+      - complaint_db
+    environment:
+      - DATABASE_URL=postgresql://postgres:2023@db:5432/complaint_db
+      - FLASK_ENV=development
+
+  frontend:
+    build:
+      context: ./frontend/frontend   # 👈 points to where package.json + Dockerfile are
+      dockerfile: Dockerfile
+    container_name: complaint_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - complaint_backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://complaint_backend:5000/api
+
+volumes:
+  postgres_data:
