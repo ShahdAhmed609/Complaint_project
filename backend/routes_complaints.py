@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app, send_from_directory
+from flask import Blueprint, request, jsonify, current_app, send_from_directory, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from extensions import db
 from models import Complaint
@@ -12,7 +12,7 @@ ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "pdf", "docx", "txt"}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# ----------------- Create Complaint -----------------
+# Create Complaint
 @complaints_bp.route("/create", methods=["POST"])
 @jwt_required()
 def create_complaint():
@@ -45,7 +45,6 @@ def create_complaint():
         upload_folder = current_app.config.get("UPLOAD_FOLDER", "uploads")
         os.makedirs(upload_folder, exist_ok=True)
         file.save(os.path.join(upload_folder, filename))
-        # نخزن اسم الملف فقط
         comp.file_path = filename
 
     db.session.add(comp)
@@ -53,7 +52,7 @@ def create_complaint():
 
     return jsonify({"msg": "Complaint created", "id": comp.id}), 201
 
-# ----------------- Student Complaints -----------------
+# Student Complaints 
 @complaints_bp.route("/my", methods=["GET"])
 @jwt_required()
 def my_complaints():
@@ -64,7 +63,7 @@ def my_complaints():
         return jsonify({"msg": "Only students can view this"}), 403
 
     comps = Complaint.query.filter_by(student_id=int(identity)).all()
-    return jsonify([
+    response = make_response(jsonify([
         {
             "id": c.id,
             "title": c.title,
@@ -75,9 +74,12 @@ def my_complaints():
             "status": c.status,
             "reply": c.reply
         } for c in comps
-    ])
+    ]))
+    # cach control for 1 minute
+    response.headers["Cache-Control"] = "public, max-age=60"
+    return response
 
-# ----------------- Admin: All Complaints -----------------
+# Admin: All Complaints
 @complaints_bp.route("/all", methods=["GET"])
 @jwt_required()
 def all_complaints():
@@ -86,7 +88,7 @@ def all_complaints():
         return jsonify({"msg": "Only admins"}), 403
 
     comps = Complaint.query.all()
-    return jsonify([
+    response = make_response(jsonify([
         {
             "id": c.id,
             "title": c.title,
@@ -99,9 +101,12 @@ def all_complaints():
             "reply": c.reply,
             "created_at": c.created_at.isoformat() 
         } for c in comps
-    ])
+    ]))
+    # cach control for 1 minute
+    response.headers["Cache-Control"] = "public, max-age=60"
+    return response
 
-# ----------------- Admin: Reply -----------------
+#  Admin: Reply
 @complaints_bp.route("/<int:id>/reply", methods=["POST"])
 @jwt_required()
 def reply(id):
@@ -122,8 +127,11 @@ def reply(id):
     db.session.commit()
     return jsonify({"msg": "Reply saved"})
 
-# ----------------- Serve Files -----------------
+# Serve complaint files
 @complaints_bp.route("/files/<filename>", methods=["GET"])
 def get_file(filename):
     upload_folder = current_app.config.get("UPLOAD_FOLDER", "uploads")
-    return send_from_directory(upload_folder, filename)
+    response = make_response(send_from_directory(upload_folder, filename))
+    # cach control for 1 day
+    response.headers["Cache-Control"] = "public, max-age=86400"
+    return response
