@@ -36,3 +36,4 @@ CREATE TABLE suggestions (
     admin_reply TEXT,
     created_at TIMESTAMP
 );
+

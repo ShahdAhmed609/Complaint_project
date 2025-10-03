@@ -1,18 +1,27 @@
-# Use Node.js base image
-FROM node:18
+# ---------- Base ----------
+FROM node:18 AS base
+WORKDIR /app
 
-# Set working directory (match the folder where package.json lives)
-WORKDIR /app/frontend
-
-# Copy package files and install dependencies
+# Copy package.json and package-lock.json
 COPY package*.json ./
+
+# Install dependencies
 RUN npm install
 
-# Copy the rest of the frontend project
+# Copy project files
 COPY . .
 
-# Expose the port
-EXPOSE 3000
-
-# Start the frontend
+# ---------- Development ----------
+FROM base AS dev
 CMD ["npm", "run", "dev"]
+
+# ---------- Production ----------
+FROM base AS prod
+# Build the Next.js app
+RUN npm run build
+
+# Start Next.js in production mode
+CMD ["npm", "run", "start"]
+
+# Expose port for Next.js
+EXPOSE 3000

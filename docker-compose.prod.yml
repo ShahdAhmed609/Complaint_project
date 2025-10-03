@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  complaint_db:
+    image: postgres:16
+    container_name: complaint_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # 🚫 No ports exposed in production → only backend can access DB
+
+  complaint_backend:
+    build:
+      context: ./backend
+      target: prod
+      dockerfile: Dockerfile
+    container_name: complaint_backend
+    command: ["./wait-for-db.sh", "db", "gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+    ports:
+      - "5000:5000"
+    depends_on:
+      - complaint_db
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@complaint_db:5432/${POSTGRES_DB}
+      - FLASK_ENV=production
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+
+  frontend:
+    build:
+      context: ./frontend/frontend
+      target: prod
+      dockerfile: Dockerfile
+    container_name: complaint_frontend
+    command: ["npm", "run", "start"]   # 👈 starts optimized build
+    ports:
+      - "3000:3000"
+    depends_on:
+      - complaint_backend
+    environment:
+      - NEXT_PUBLIC_API_URL=https://your-domain.com/api   # 👈 change to your Render domain
+
+volumes:
+  postgres_data:
