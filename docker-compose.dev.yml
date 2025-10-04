@@ -30,7 +30,7 @@ services:
 
   frontend:
     build:
-      context: ./frontend/frontend   # 👈 points to where package.json + Dockerfile are
+      context: ./frontend/frontend
       target: dev
       dockerfile: Dockerfile
     container_name: complaint_frontend
@@ -40,6 +40,22 @@ services:
       - complaint_backend
     environment:
       - NEXT_PUBLIC_API_URL=http://complaint_backend:5000/api
+
+  create-admin:
+    build:
+      context: ./backend
+      target: dev
+      dockerfile: Dockerfile
+    command: ["python", "create_admin.py"]
+    volumes:
+      - ./backend:/app
+    environment:
+      - ADMIN_NAME=Super Admin
+      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_PASSWORD=12345
+      - DATABASE_URL=postgresql://postgres:2023@db:5432/complaint_db
+    depends_on:
+      - complaint_backend
 
 volumes:
   postgres_data:
