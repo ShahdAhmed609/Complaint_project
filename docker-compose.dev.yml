@@ -30,7 +30,7 @@ services:
 
   frontend:
     build:
-      context: ./frontend/frontend   # 👈 points to where package.json + Dockerfile are
+      context: ./frontend/frontend   # points to where package.json + Dockerfile are
       target: dev
       dockerfile: Dockerfile
     container_name: complaint_frontend
