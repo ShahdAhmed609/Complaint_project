@@ -42,7 +42,7 @@ export default function ComplaintDetails() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSuccess("Reply saved successfully.");
-      // تحديث الرد في الصفحة بعد الحفظ
+      
       setComplaint({ ...complaint, reply, status });
     } catch {
       setError("Failed to save reply.");

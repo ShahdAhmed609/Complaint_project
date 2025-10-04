@@ -16,7 +16,7 @@ export default function ReviewComplaintPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // ✅ تحميل البيانات النصية
+
     const storedData = sessionStorage.getItem("complaintData");
     if (storedData) {
       const parsed = JSON.parse(storedData);
@@ -25,11 +25,11 @@ export default function ReviewComplaintPage() {
       router.push("/student/complaints/new");
     }
 
-    // ✅ تحميل الملف من sessionStorage (base64 → File)
+    
     const storedFile = sessionStorage.getItem("uploadedFile");
     if (storedFile) {
       const parsed = JSON.parse(storedFile);
-      const byteString = atob(parsed.data.split(",")[1]); // نفصل الـ header عن الداتا
+      const byteString = atob(parsed.data.split(",")[1]); 
       const mimeString = parsed.type;
       const ab = new ArrayBuffer(byteString.length);
       const ia = new Uint8Array(ab);
@@ -52,7 +52,7 @@ export default function ReviewComplaintPage() {
       if (data.suggestion) formData.append("suggestion", data.suggestion);
 
       if (file) {
-        formData.append("file", file); // ✅ الملف الحقيقي يتبعت هنا
+        formData.append("file", file); 
       }
 
       const token = localStorage.getItem("studentToken");

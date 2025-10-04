@@ -24,7 +24,7 @@ export default function AdminComplaintsPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // ترتيب حسب الحالة أولًا، وبعدها الأحدث
+      
       const statusOrder = { pending: 1, resolved: 2, terminated: 3 };
       const sortedComplaints = res.data.sort((a, b) => {
         if (statusOrder[a.status] !== statusOrder[b.status]) {
