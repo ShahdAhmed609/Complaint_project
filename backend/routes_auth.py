@@ -7,9 +7,9 @@ from flask_jwt_extended import create_access_token
 # blueprint for authentication
 auth_bp = Blueprint("auth", __name__)
 
-# --------------------------
+
 # route for register a new student
-# --------------------------
+
 @auth_bp.route("/register", methods=["POST"])
 def register_student():
     data = request.json
@@ -31,9 +31,9 @@ def register_student():
     return jsonify({"msg": "Student registered"}), 201
 
 
-# --------------------------
+
 # route for login student 
-# --------------------------
+
 @auth_bp.route("/login", methods=["POST"])
 def student_login():
     data = request.json
@@ -53,9 +53,9 @@ def student_login():
     return jsonify({"token": token, "role": "student"}), 200
 
 
-# --------------------------
+
 # route for admin login only
-# --------------------------
+
 @auth_bp.route("/admin/login", methods=["POST"])
 def admin_login():
     data = request.json

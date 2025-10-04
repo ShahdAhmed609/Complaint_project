@@ -1,4 +1,4 @@
-// src/app/student/complaints/new/page.tsx
+
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,7 @@ export default function NewComplaintPage() {
   const [file, setFile] = useState<File | null>(null);
   const router = useRouter();
 
-  // ✅ تحميل البيانات المحفوظة لو رجع من review
+
   useEffect(() => {
     const saved = sessionStorage.getItem("complaintData");
     if (saved) {
@@ -21,14 +21,14 @@ export default function NewComplaintPage() {
     }
   }, []);
 
-  // ✅ تخزين الملف في state و sessionStorage
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
     if (!selectedFile) return;
 
     setFile(selectedFile);
 
-    // نخزن بيانات الملف مؤقتًا كـ Base64 في sessionStorage
+
     const reader = new FileReader();
     reader.onload = () => {
       sessionStorage.setItem(
@@ -43,7 +43,6 @@ export default function NewComplaintPage() {
     reader.readAsDataURL(selectedFile);
   };
 
-  // ✅ حفظ البيانات النصية في sessionStorage والانتقال للـ review
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -51,7 +50,7 @@ export default function NewComplaintPage() {
       title,
       department,
       description,
-      fileName: file ? file.name : null, // مجرد الاسم للعرض
+      fileName: file ? file.name : null, 
     };
 
     sessionStorage.setItem("complaintData", JSON.stringify(complaintData));

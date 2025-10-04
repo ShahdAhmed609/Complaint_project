@@ -24,7 +24,7 @@ export default function AdminSuggestionsPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // ترتيب الاقتراحات حسب الحالة أولًا ثم الأحدث
+    
       const statusOrder = { "under review": 1, accepted: 2, rejected: 3 };
       const sortedSuggestions = res.data.sort((a, b) => {
         if (statusOrder[a.status] !== statusOrder[b.status]) {
