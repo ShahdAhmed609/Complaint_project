@@ -1,6 +1,6 @@
-FROM python:3.11-slim
+FROM python:3.11-slim AS base
 
-# Install system dependencies (including PostgreSQL client)
+# Install system dependencies (Postgres client + netcat)
 RUN apt-get update && apt-get install -y \
     netcat-traditional \
     postgresql-client \
@@ -19,5 +19,18 @@ COPY . .
 # Make wait-for-db.sh executable
 RUN chmod +x wait-for-db.sh
 
-# Run the wait-for-db script before starting Flask
+
+# ---------- Development ----------
+FROM base AS dev
 CMD ["./wait-for-db.sh", "db", "python", "app.py"]
+
+
+# ---------- Production ----------
+FROM base AS prod
+# Install Gunicorn for production server
+RUN pip install gunicorn
+
+# Run with Gunicorn (4 workers, 2 threads each)
+CMD ["./wait-for-db.sh", "db", "gunicorn", "-w", "4", "-k", "gthread", "-b", "0.0.0.0:5000", "app:app"]
+
+EXPOSE 5000
