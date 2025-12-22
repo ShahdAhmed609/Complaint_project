@@ -16,28 +16,18 @@ export default function ReviewComplaintPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // ✅ تحميل البيانات النصية
     const storedData = sessionStorage.getItem("complaintData");
-    if (storedData) {
-      const parsed = JSON.parse(storedData);
-      setData(parsed);
-    } else {
-      router.push("/student/complaints/new");
-    }
+    if (!storedData) return router.push("/student/complaints/new");
+    setData(JSON.parse(storedData));
 
-    // ✅ تحميل الملف من sessionStorage (base64 → File)
     const storedFile = sessionStorage.getItem("uploadedFile");
     if (storedFile) {
       const parsed = JSON.parse(storedFile);
-      const byteString = atob(parsed.data.split(",")[1]); // نفصل الـ header عن الداتا
-      const mimeString = parsed.type;
+      const byteString = atob(parsed.data.split(",")[1]);
       const ab = new ArrayBuffer(byteString.length);
       const ia = new Uint8Array(ab);
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-      }
-      const newFile = new File([ab], parsed.name, { type: mimeString });
-      setFile(newFile);
+      for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+      setFile(new File([ab], parsed.name, { type: parsed.type }));
     }
   }, [router]);
 
@@ -46,83 +36,64 @@ export default function ReviewComplaintPage() {
 
     try {
       const formData = new FormData();
-      formData.append("title", data.title);
-      formData.append("department", data.department);
-      formData.append("description", data.description);
-      if (data.suggestion) formData.append("suggestion", data.suggestion);
-
-      if (file) {
-        formData.append("file", file); // ✅ الملف الحقيقي يتبعت هنا
-      }
+      Object.entries(data).forEach(([k, v]) => v && formData.append(k, v));
+      if (file) formData.append("file", file);
 
       const token = localStorage.getItem("studentToken");
 
       const res = await fetch("http://127.0.0.1:5000/api/complaints/create", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
-      if (!res.ok) {
-        const errText = await res.text();
-        console.error("❌ Response Error Body:", errText);
-        throw new Error("Failed to submit complaint");
-      }
-
-      const result = await res.json();
-      console.log("✅ Server Response JSON:", result);
-
+      if (!res.ok) throw new Error();
       router.push("/student/complaints/success");
-    } catch (err) {
-      console.error("🔥 Submit Error:", err);
+    } catch {
       alert("❌ Failed to submit complaint");
     }
   };
 
-  if (!data) return <p>Loading...</p>;
+  if (!data) return null;
 
   return (
-  <main className="flex min-h-screen flex-col items-center bg-slate-50 p-8">
-    <div className="w-full max-w-2xl rounded-xl bg-white p-8 shadow-md">
-      <h1 className="mb-6 text-center text-3xl font-bold text-slate-800">
-        Review Submission
-      </h1>
-      <div className="space-y-4">
-        <div>
-          <h2 className="font-semibold text-black">Title:</h2>
-          <p className="text-black">{data.title}</p>
-        </div>
-        <div>
-          <h2 className="font-semibold text-black">Department:</h2>
-          <p className="text-black">{data.department}</p>
-        </div>
-        <div>
-          <h2 className="font-semibold text-black">Description:</h2>
-          <p className="text-black">{data.description}</p>
-        </div>
-        <div>
-          <h2 className="font-semibold text-black">File:</h2>
-          <p className="text-black">{file ? file.name : "No file attached"}</p>
-        </div>
-      </div>
-      <div className="mt-8 flex justify-between gap-4">
-        <button
-          onClick={() => router.back()}
-          className="flex-1 rounded-lg bg-gray-300 px-4 py-3 font-semibold"
-        >
-          Back to Edit
-        </button>
-        <button
-          onClick={handleSubmit}
-          className="flex-1 rounded-lg bg-green-600 px-4 py-3 font-semibold text-white"
-        >
-          Confirm & Submit
-        </button>
-      </div>
-    </div>
-  </main>
-);
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 px-4">
+      <section className="w-full max-w-2xl bg-white/70 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-xl p-8 animate-float">
+        <h1 className="text-center text-3xl font-extrabold mb-8 text-gray-800 dark:text-white">
+          Review your complaint
+        </h1>
 
+        <div className="space-y-4 text-gray-700 dark:text-gray-200">
+          <Info label="Title" value={data.title} />
+          <Info label="Department" value={data.department} />
+          <Info label="Description" value={data.description} />
+          <Info label="File" value={file ? file.name : "No file attached"} />
+        </div>
+
+        <div className="mt-10 flex gap-4">
+          <button
+            onClick={() => router.back()}
+            className="flex-1 rounded-xl bg-gray-200 dark:bg-slate-700 py-3 font-semibold hover:scale-105 transition"
+          >
+            Back
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-green-400 py-3 font-semibold text-white hover:scale-105 transition"
+          >
+            Confirm & Submit
+          </button>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function Info({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="font-semibold">{label}</p>
+      <p>{value}</p>
+    </div>
+  );
 }

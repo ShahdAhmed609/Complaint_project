@@ -16,7 +16,6 @@ export default function AdminSuggestionsPage() {
       const token = localStorage.getItem("adminToken");
       if (!token) {
         setError("Admin token not found. Please login again.");
-        setLoading(false);
         return;
       }
 
@@ -24,19 +23,17 @@ export default function AdminSuggestionsPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // ترتيب الاقتراحات حسب الحالة أولًا ثم الأحدث
       const statusOrder = { "under review": 1, accepted: 2, rejected: 3 };
-      const sortedSuggestions = res.data.sort((a, b) => {
+      const sorted = res.data.sort((a, b) => {
         if (statusOrder[a.status] !== statusOrder[b.status]) {
           return statusOrder[a.status] - statusOrder[b.status];
         }
         return new Date(b.created_at) - new Date(a.created_at);
       });
 
-      setSuggestions(sortedSuggestions);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to fetch suggestions. Please try again.");
+      setSuggestions(sorted);
+    } catch {
+      setError("Failed to fetch suggestions.");
     } finally {
       setLoading(false);
     }
@@ -46,52 +43,76 @@ export default function AdminSuggestionsPage() {
     fetchData();
   }, []);
 
-  if (loading) return <p className="text-center mt-10">Loading suggestions…</p>;
-  if (error) return <p className="text-center mt-10 text-red-600">{error}</p>;
+  if (loading)
+    return <p className="text-center mt-20 text-slate-600">Loading suggestions…</p>;
+
+  if (error)
+    return <p className="text-center mt-20 text-red-600">{error}</p>;
 
   return (
-    <div className="max-w-6xl mx-auto mt-10 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-center text-black">All Suggestions</h1>
+    <main className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 px-4 py-10">
+      <section className="max-w-7xl mx-auto bg-white/70 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-xl p-8 animate-float">
+        <h1 className="text-3xl font-extrabold mb-8 text-gray-800 dark:text-white">
+          💡 All Suggestions
+        </h1>
 
-      {suggestions.length === 0 ? (
-        <p className="text-center text-gray-500">No suggestions available.</p>
-      ) : (
-        <div className="overflow-x-auto shadow rounded-lg">
-          <table className="min-w-full bg-white border border-gray-200">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="py-3 px-4 border-b text-black">Title</th>
-                <th className="py-3 px-4 border-b text-black">Student</th>
-                <th className="py-3 px-4 border-b text-black">Department</th>
-                <th className="py-3 px-4 border-b text-black">Status</th>
-                <th className="py-3 px-4 border-b text-black">Created At</th>
-                <th className="py-3 px-4 border-b text-black">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {suggestions.map((s) => (
-                <tr key={s.id} className="hover:bg-gray-50">
-                  <td className="py-3 px-4 border-b text-black">{s.title}</td>
-                  <td className="py-3 px-4 border-b text-black">{s.student_id}</td>
-                  <td className="py-3 px-4 border-b text-black">{s.department}</td>
-                  <td className="py-3 px-4 border-b text-black">{s.status}</td>
-                  <td className="py-3 px-4 border-b text-black">
-                    {new Date(s.created_at).toLocaleString()}
-                  </td>
-                  <td className="py-3 px-4 border-b text-black">
-                    <Link
-                      href={`/admin/suggestions/${s.id}`}
-                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+        {suggestions.length === 0 ? (
+          <p className="text-center text-slate-500">No suggestions available.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-2xl shadow">
+            <table className="min-w-full bg-white/90 dark:bg-slate-900">
+              <thead className="bg-slate-100 dark:bg-slate-800">
+                <tr>
+                  {["Title", "Student", "Department", "Status", "Created", "Action"].map((h) => (
+                    <th
+                      key={h}
+                      className="py-3 px-4 text-left text-sm font-semibold text-slate-700 dark:text-slate-300"
                     >
-                      View / Manage
-                    </Link>
-                  </td>
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+              </thead>
+              <tbody>
+                {suggestions.map((s) => (
+                  <tr
+                    key={s.id}
+                    className="border-t border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                  >
+                    <td className="py-3 px-4">{s.title}</td>
+                    <td className="py-3 px-4">{s.student_id}</td>
+                    <td className="py-3 px-4">{s.department}</td>
+                    <td className="py-3 px-4">
+                      <span
+                        className={
+                          s.status === "under review"
+                            ? "text-yellow-500"
+                            : s.status === "accepted"
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }
+                      >
+                        {s.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      {new Date(s.created_at).toLocaleString()}
+                    </td>
+                    <td className="py-3 px-4">
+                      <Link
+                        href={`/admin/suggestions/${s.id}`}
+                        className="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition"
+                      >
+                        View / Manage
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </main>
   );
 }
