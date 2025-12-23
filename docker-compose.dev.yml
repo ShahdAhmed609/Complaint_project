@@ -40,6 +40,6 @@ services:
       - complaint_backend
     environment:
       - NEXT_PUBLIC_API_URL=http://complaint_backend:5000/api
-
+  
 volumes:
   postgres_data:

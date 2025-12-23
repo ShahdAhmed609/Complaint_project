@@ -17,7 +17,7 @@ export default function SuggestionSuccessPage() {
 
         <div className="flex gap-4">
           <button
-            onClick={() => router.push("/student/suggestions/my")}
+            onClick={() => router.push("/student/complaints/my")}
             className="flex-1 rounded-xl bg-gradient-to-r from-indigo-500 to-sky-400 py-3 font-semibold text-white hover:scale-105 transition"
           >
             My Suggestions
