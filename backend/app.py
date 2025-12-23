@@ -6,6 +6,7 @@ from sqlalchemy import text
 from routes_complaints import complaints_bp
 from routes_auth import auth_bp
 from routes_suggestions import suggestions_bp
+from models import Admin
 
 jwt = JWTManager()
 
@@ -32,7 +33,9 @@ def create_app():
     with app.app_context():
         try:
             db.session.execute(text("SELECT 1"))
+            
             print("✅ Database connected successfully!")
+
             db.create_all()
         except Exception as e:
             print("❌ Database connection failed:", e)

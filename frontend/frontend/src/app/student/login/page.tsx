@@ -50,51 +50,129 @@ export default function LoginPage() {
   };
 
  return (
-  <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-purple-100 p-4">
-    <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
-      <h1 className="text-center text-3xl font-bold text-slate-800">Welcome Back!</h1>
-      <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+  <main
+    className="
+      min-h-screen w-full flex items-center justify-center
+      bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100
+      dark:from-slate-900 dark:via-slate-800 dark:to-slate-900
+      px-4 sm:px-6 lg:px-8
+    "
+  >
+    {/* Floating Card */}
+    <section
+      className="
+        w-full max-w-md
+        bg-white/70 dark:bg-slate-800/80
+        backdrop-blur-md
+        rounded-3xl
+        shadow-xl dark:shadow-2xl
+        p-6 sm:p-8 md:p-10
+        animate-float
+      "
+    >
+      {/* Heading */}
+      <h1
+        className="
+          text-center font-extrabold tracking-tight mb-2
+          text-gray-800 dark:text-slate-100
+          text-[clamp(1.8rem,4vw,2.5rem)]
+        "
+      >
+        Welcome Back
+      </h1>
+
+      <p className="text-center text-gray-600 dark:text-slate-300 mb-8">
+        Sign in to continue to your dashboard
+      </p>
+
+      <form className="space-y-6" onSubmit={handleLogin}>
+        {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-black font-medium">Email</label>
+          <label
+            htmlFor="email"
+            className="block mb-1 text-sm font-medium text-gray-700 dark:text-slate-300"
+          >
+            Email
+          </label>
           <input
             id="email"
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 block w-full p-2 border rounded text-black placeholder-grey shadow-sm"
-            placeholder="Enter your email"
+            placeholder="you@example.com"
+            className="
+              w-full rounded-xl px-4 py-3
+              bg-white dark:bg-slate-700
+              border border-gray-200 dark:border-slate-600
+              text-gray-800 dark:text-slate-100
+              placeholder-gray-400 dark:placeholder-slate-400
+              focus:outline-none focus:ring-2 focus:ring-blue-400
+            "
           />
         </div>
+
+        {/* Password */}
         <div>
-          <label htmlFor="password" className="block text-black font-medium">Password</label>
+          <label
+            htmlFor="password"
+            className="block mb-1 text-sm font-medium text-gray-700 dark:text-slate-300"
+          >
+            Password
+          </label>
           <input
             id="password"
             type="password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 block w-full p-2 border rounded text-black placeholder-grey shadow-sm"
-            placeholder="Enter your password"
+            placeholder="••••••••"
+            className="
+              w-full rounded-xl px-4 py-3
+              bg-white dark:bg-slate-700
+              border border-gray-200 dark:border-slate-600
+              text-gray-800 dark:text-slate-100
+              placeholder-gray-400 dark:placeholder-slate-400
+              focus:outline-none focus:ring-2 focus:ring-blue-400
+            "
           />
         </div>
-        {error && <p className="text-sm text-red-600 text-center">{error}</p>}
+
+        {/* Error */}
+        {error && (
+          <p className="text-sm text-red-500 text-center">{error}</p>
+        )}
+
+        {/* Submit */}
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white disabled:opacity-50"
+          className="
+            w-full rounded-xl px-4 py-3 font-semibold text-white
+            bg-gradient-to-r from-blue-500 to-sky-400
+            hover:from-blue-600 hover:to-sky-500
+            shadow-lg hover:shadow-xl
+            transition-all duration-300
+            disabled:opacity-50
+          "
         >
           {loading ? "Logging in..." : "Login"}
         </button>
-        <p className="text-center text-black text-sm">
-          Don't have an account?
-          <Link href="/student/register" className="font-medium text-indigo-600 ml-1">
+
+        {/* Register */}
+        <p className="text-center text-sm text-gray-600 dark:text-slate-300">
+          Don&apos;t have an account?
+          <Link
+            href="/student/register"
+            className="ml-1 font-medium text-blue-600 dark:text-sky-400 hover:underline"
+          >
             Register Now
           </Link>
         </p>
       </form>
-    </div>
+    </section>
   </main>
 );
+
 
 }

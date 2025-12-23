@@ -18,84 +18,59 @@ export default function MyComplaintsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchComplaints = async () => {
-      try {
-        const token = localStorage.getItem("studentToken");
-        const { data } = await axios.get<Complaint[]>(
-          "http://127.0.0.1:5000/api/complaints/my",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setComplaints(data);
-      } catch (err) {
-        console.error("Error fetching complaints:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchComplaints();
+    const token = localStorage.getItem("studentToken");
+    axios
+      .get("http://127.0.0.1:5000/api/complaints/my", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setComplaints(res.data))
+      .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="p-8">Loading your complaints...</p>;
-
-  if (complaints.length === 0)
-    return <p className="p-8">You have not submitted any complaints yet.</p>;
+  if (loading) return null;
 
   return (
-    <main className="flex min-h-screen flex-col items-center bg-slate-50 p-8">
-      <div className="w-full max-w-3xl rounded-xl bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-3xl font-bold text-slate-800">My Complaints</h1>
+    <main className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 px-4 py-10">
+      <section className="max-w-4xl mx-auto bg-white/70 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-xl p-8 animate-float">
+        <h1 className="text-3xl font-extrabold mb-8 text-gray-800 dark:text-white">
+          My Complaints
+        </h1>
+
         <div className="space-y-6">
           {complaints.map((c) => (
             <div
               key={c.id}
-              className="rounded-lg border border-gray-200 p-4 shadow-sm"
+              className="rounded-2xl bg-white/90 dark:bg-slate-900 p-6 shadow-md"
             >
-              <h2 className="text-xl text-black font-semibold">{c.title}</h2>
-              <p className="text-sm text-gray-600">Dept: {c.department}</p>
-              <p className="mt-2 text-black">{c.description}</p>
-              {c.suggestion && (
-                <p className="mt-2 text-sm text-gray-700">
-                  Suggestion: {c.suggestion}
-                </p>
-              )}
-              {c.file_path && (
-                <a
-                  href={`http://127.0.0.1:5000/api/complaints/files/${c.file_path.split("/").pop()}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-2 block text-blue-600 underline"
-                >
-                  View Attachment
-                </a>
-              )}
-              <p className="mt-2 text-black text-sm font-medium">
+              <h2 className="text-xl font-bold">{c.title}</h2>
+              <p className="text-sm text-gray-500">{c.department}</p>
+
+              <p className="mt-3">{c.description}</p>
+
+              <p className="mt-3 font-medium">
                 Status:{" "}
                 <span
                   className={
                     c.status === "pending"
-                      ? "text-yellow-600"
+                      ? "text-yellow-500"
                       : c.status === "resolved"
-                      ? "text-green-600"
-                      : "text-red-600"
+                      ? "text-green-500"
+                      : "text-red-500"
                   }
                 >
                   {c.status}
                 </span>
               </p>
+
               {c.reply && (
-                <p className="mt-2 text-sm text-gray-700">
+                <p className="mt-3 text-sm">
                   <strong>Admin Reply:</strong> {c.reply}
                 </p>
               )}
             </div>
           ))}
         </div>
-      </div>
+      </section>
     </main>
   );
 }

@@ -1,4 +1,3 @@
-// src/app/student/suggestions/review/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -76,51 +75,43 @@ export default function ReviewSuggestionPage() {
 
   if (!data) return <p>Loading...</p>;
 
-  return (
-    <main className="flex min-h-screen flex-col items-center bg-slate-50 p-8">
-      <div className="w-full max-w-2xl rounded-xl bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-3xl font-bold text-slate-800">
-          Review Your Suggestion
+ return (
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 px-4">
+      <section className="w-full max-w-2xl bg-white/70 dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-xl p-8 animate-float">
+        <h1 className="text-center text-3xl font-extrabold mb-8 text-gray-800 dark:text-white">
+          Review your Suggestion
         </h1>
 
-        <div className="space-y-4">
-          <div>
-            <h2 className="font-semibold text-black">Title:</h2>
-            <p className="text-black">{data.title}</p>
-          </div>
-
-          <div>
-            <h2 className="font-semibold text-black">Department:</h2>
-            <p className="text-black">{data.department}</p>
-          </div>
-
-          <div>
-            <h2 className="font-semibold text-black">Description:</h2>
-            <p className="text-black">{data.description}</p>
-          </div>
-
-          <div>
-            <h2 className="font-semibold text-black">File:</h2>
-            <p className="text-black">{file ? file.name : "No file attached"}</p>
-          </div>
+        <div className="space-y-4 text-gray-700 dark:text-gray-200">
+          <Info label="Title" value={data.title} />
+          <Info label="Department" value={data.department} />
+          <Info label="Description" value={data.description} />
+          <Info label="File" value={file ? file.name : "No file attached"} />
         </div>
 
-        <div className="mt-8 flex justify-between gap-4">
+        <div className="mt-10 flex gap-4">
           <button
             onClick={() => router.back()}
-            className="flex-1 rounded-lg bg-gray-300 px-4 py-3 font-semibold hover:bg-gray-400"
+            className="flex-1 rounded-xl bg-gray-200 dark:bg-slate-700 py-3 font-semibold hover:scale-105 transition"
           >
-            Back to Edit
+            Back
           </button>
-
           <button
             onClick={handleSubmit}
-            className="flex-1 rounded-lg bg-green-600 px-4 py-3 font-semibold text-white hover:bg-green-700"
+            className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-green-400 py-3 font-semibold text-white hover:scale-105 transition"
           >
             Confirm & Submit
           </button>
         </div>
-      </div>
+      </section>
     </main>
+  );
+}
+function Info({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="font-semibold">{label}</p>
+      <p>{value}</p>
+    </div>
   );
 }
