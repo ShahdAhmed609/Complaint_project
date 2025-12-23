@@ -1,5 +1,6 @@
 
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -9,7 +10,6 @@ export default function NewComplaintPage() {
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const router = useRouter();
-
 
   useEffect(() => {
     const saved = sessionStorage.getItem("complaintData");
@@ -21,13 +21,11 @@ export default function NewComplaintPage() {
     }
   }, []);
 
-  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
     if (!selectedFile) return;
 
     setFile(selectedFile);
-
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -36,7 +34,7 @@ export default function NewComplaintPage() {
         JSON.stringify({
           name: selectedFile.name,
           type: selectedFile.type,
-          data: reader.result, // base64 data
+          data: reader.result,
         })
       );
     };
@@ -46,74 +44,136 @@ export default function NewComplaintPage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const complaintData = {
-      title,
-      department,
-      description,
-      fileName: file ? file.name : null, 
-    };
+    sessionStorage.setItem(
+      "complaintData",
+      JSON.stringify({
+        title,
+        department,
+        description,
+        fileName: file ? file.name : null,
+      })
+    );
 
-    sessionStorage.setItem("complaintData", JSON.stringify(complaintData));
     router.push("/student/complaints/review");
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center bg-slate-50 p-8">
-      <div className="w-full max-w-2xl rounded-xl bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-3xl font-bold text-slate-800">
+    <main
+      className="
+        min-h-screen w-full
+        flex items-center justify-center
+        bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100
+        dark:from-slate-900 dark:via-slate-800 dark:to-slate-900
+        px-4
+      "
+    >
+      {/* Floating Glass Card */}
+      <section
+        className="
+          w-full max-w-2xl
+          bg-white/70 dark:bg-slate-800/80
+          backdrop-blur-lg
+          rounded-3xl
+          shadow-xl
+          p-6 sm:p-8 md:p-10
+          animate-float
+        "
+      >
+        <h1
+          className="
+            mb-8 text-center font-extrabold tracking-tight
+            text-gray-800 dark:text-slate-100
+            text-[clamp(1.8rem,4vw,2.5rem)]
+          "
+        >
           Submit a New Complaint
         </h1>
+
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Title */}
           <input
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title"
-            className="block w-full border rounded text-black placeholder-grey shadow-sm"
+            placeholder="Complaint title"
+            className="
+              w-full rounded-xl border border-gray-300
+              bg-white/90 dark:bg-slate-900
+              px-4 py-3 text-gray-800 dark:text-white
+              placeholder-gray-400
+              focus:outline-none focus:ring-2 focus:ring-sky-400
+            "
           />
 
+          {/* Department */}
           <select
             required
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
-            className="block w-full border rounded text-black placeholder-grey shadow-sm"
+            className="
+              w-full rounded-xl border border-gray-300
+              bg-white/90 dark:bg-slate-900
+              px-4 py-3 text-gray-800 dark:text-white
+              focus:outline-none focus:ring-2 focus:ring-sky-400
+            "
           >
             <option value="" disabled>
-              Select a department
+              Select department
             </option>
             <option value="student_affairs">Student Affairs</option>
             <option value="academics">Academics</option>
           </select>
 
+          {/* Description */}
           <textarea
             required
             rows={5}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Description"
-            className="block w-full border rounded text-black placeholder-grey shadow-sm"
-          ></textarea>
+            placeholder="Describe your complaint clearly..."
+            className="
+              w-full rounded-xl border border-gray-300
+              bg-white/90 dark:bg-slate-900
+              px-4 py-3 text-gray-800 dark:text-white
+              placeholder-gray-400
+              focus:outline-none focus:ring-2 focus:ring-sky-400
+            "
+          />
 
+          {/* File Upload */}
           <input
             type="file"
             onChange={handleFileChange}
-            className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0"
+            className="
+              w-full text-sm text-slate-600 dark:text-slate-300
+              file:mr-4 file:rounded-full
+              file:border-0 file:px-4 file:py-2
+              file:bg-sky-100 file:text-sky-700
+              hover:file:bg-sky-200
+            "
           />
 
           {file && (
-            <p className="text-green-600 text-sm">
+            <p className="text-sm text-emerald-600">
               ✅ Selected file: {file.name}
             </p>
           )}
 
+          {/* Submit */}
           <button
             type="submit"
-            className="flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white"
+            className="
+              w-full rounded-xl
+              bg-gradient-to-r from-sky-500 to-indigo-500
+              py-3 font-semibold text-white
+              transition-all duration-300
+              hover:scale-[1.02] hover:shadow-lg
+            "
           >
             Proceed to Review
           </button>
         </form>
-      </div>
+      </section>
     </main>
   );
 }
