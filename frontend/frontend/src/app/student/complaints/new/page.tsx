@@ -3,14 +3,47 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+function getJwtPayload(token: string) {
+  try {
+    return JSON.parse(atob(token.split(".")[1]));
+  } catch {
+    return null;
+  }
+}
+
 export default function NewComplaintPage() {
+  const router = useRouter();
+
   const [title, setTitle] = useState("");
   const [department, setDepartment] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
 
+  // 🔐 AUTH GUARD
   useEffect(() => {
+    const token = localStorage.getItem("studentToken");
+
+    if (!token) {
+      router.replace("/student/login");
+      return;
+    }
+
+    const payload = getJwtPayload(token);
+
+    if (!payload || payload.role !== "student") {
+      localStorage.removeItem("token");
+      router.replace("/student/login");
+      return;
+    }
+
+    setAuthorized(true);
+  }, [router]);
+
+  // 🧠 Restore saved form data
+  useEffect(() => {
+    if (!authorized) return;
+
     const saved = sessionStorage.getItem("complaintData");
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -18,7 +51,9 @@ export default function NewComplaintPage() {
       setDepartment(parsed.department || "");
       setDescription(parsed.description || "");
     }
-  }, []);
+  }, [authorized]);
+
+  if (!authorized) return null; // ⛔ Prevent flash
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
@@ -66,7 +101,6 @@ export default function NewComplaintPage() {
         px-4
       "
     >
-      {/* Floating Glass Card */}
       <section
         className="
           w-full max-w-2xl
@@ -89,84 +123,43 @@ export default function NewComplaintPage() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Title */}
           <input
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Complaint title"
-            className="
-              w-full rounded-xl border border-gray-300
-              bg-white/90 dark:bg-slate-900
-              px-4 py-3 text-gray-800 dark:text-white
-              placeholder-gray-400
-              focus:outline-none focus:ring-2 focus:ring-sky-400
-            "
+            className="w-full rounded-xl border px-4 py-3"
           />
 
-          {/* Department */}
           <select
             required
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
-            className="
-              w-full rounded-xl border border-gray-300
-              bg-white/90 dark:bg-slate-900
-              px-4 py-3 text-gray-800 dark:text-white
-              focus:outline-none focus:ring-2 focus:ring-sky-400
-            "
+            className="w-full rounded-xl border px-4 py-3"
           >
-            <option value="" disabled>
-              Select department
-            </option>
+            <option value="" disabled>Select department</option>
             <option value="student_affairs">Student Affairs</option>
             <option value="academics">Academics</option>
           </select>
 
-          {/* Description */}
           <textarea
             required
             rows={5}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe your complaint clearly..."
-            className="
-              w-full rounded-xl border border-gray-300
-              bg-white/90 dark:bg-slate-900
-              px-4 py-3 text-gray-800 dark:text-white
-              placeholder-gray-400
-              focus:outline-none focus:ring-2 focus:ring-sky-400
-            "
+            placeholder="Describe your complaint..."
+            className="w-full rounded-xl border px-4 py-3"
           />
 
-          {/* File Upload */}
-          <input
-            type="file"
-            onChange={handleFileChange}
-            className="
-              w-full text-sm text-slate-600 dark:text-slate-300
-              file:mr-4 file:rounded-full
-              file:border-0 file:px-4 file:py-2
-              file:bg-sky-100 file:text-sky-700
-              hover:file:bg-sky-200
-            "
-          />
+          <input type="file" onChange={handleFileChange} />
 
-          {file && (
-            <p className="text-sm text-emerald-600">
-              ✅ Selected file: {file.name}
-            </p>
-          )}
-
-          {/* Submit */}
           <button
             type="submit"
             className="
               w-full rounded-xl
               bg-gradient-to-r from-sky-500 to-indigo-500
               py-3 font-semibold text-white
-              transition-all duration-300
-              hover:scale-[1.02] hover:shadow-lg
+              hover:scale-[1.02]
             "
           >
             Proceed to Review
